@@ -1,183 +1,244 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Komunitas Prestasi IPB</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komunitas Prestasi IPB</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f5f6fb; color:#333; }
+        
+        /* NAVBAR */
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:white; box-shadow:0 3px 12px rgba(0,0,0,0.1); sticky top-0 z-50; }
+        .logo { font-weight:bold; font-size:20px; color:#1e3a8a; }
+        nav a { margin:0 10px; text-decoration:none; color:#333; font-weight:500; }
+        nav a:hover { color:#1e3a8a; }
+        .login { background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight: bold; }
+
+        /* CERITA KOMUNITAS */
+        .story { padding:40px; background:linear-gradient(90deg,#9c27b0,#2196f3); color:white; }
+        .story h2 { margin-bottom:20px; }
+        .story-container { display:flex; gap:20px; overflow-x:auto; padding-bottom: 10px; }
+        .story-card { min-width:280px; background:white; border-radius:15px; overflow:hidden; color:black; box-shadow:0 6px 15px rgba(0,0,0,0.15); }
+        .story-card img { width:100%; height:160px; object-fit:cover; }
+        .story-text { padding:15px; }
+        .story-text h3 { margin: 0; font-size: 16px; color: #1e3a8a; }
+        .story-text p { font-size: 13px; color: #666; margin-top: 5px; }
+
+        /* CAPAIAN PRESTASI */
+        .achievement { padding:40px; }
+        .cluster { display:flex; gap:20px; flex-wrap:wrap; }
+        .cluster-box { padding:20px; border-radius:12px; color:white; font-weight:bold; font-size:18px; min-width:160px; flex: 1; }
+        .cluster-box span { display:block; font-size:30px; margin-top:5px; }
+        .pink { background:#ff7eb3; } .yellow { background:#facc15; } .green { background:#22c55e; } .blue { background:#3b82f6; } .purple { background:#9333ea; }
+
+        /* LEADERBOARD */
+        .leaderboard { padding:40px; }
+        .leaderboard table { width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; box-shadow:0 5px 12px rgba(0,0,0,0.1); }
+        th { background:#1e3a8a; color:white; padding:12px; text-align:left; }
+        td { padding:12px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background:#f1f5f9; }
+
+        /* UPCOMING EVENT */
+        .event { padding:40px; }
+        .event-container { display:flex; gap:20px; flex-wrap:wrap; }
+        .event-card { background:white; padding:15px; border-radius:15px; width:220px; text-align:center; box-shadow:0 6px 15px rgba(0,0,0,0.1); }
+        .event-card img { width:100%; border-radius:10px; height: 280px; object-fit: cover; }
+        .event-card button { margin-top:10px; background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; width: 100%; font-weight: bold; }
+
+        /* PROJECT */
+        .project { padding:40px; }
+        .project-container { display:flex; gap:20px; flex-wrap:wrap; }
+        .project-card { background:white; padding:20px; border-radius:15px; width:300px; box-shadow:0 6px 15px rgba(0,0,0,0.1); }
+        .project-card h3 { color: #1e3a8a; margin-top: 0; }
+        .leader-tag { font-size: 12px; font-weight: bold; color: #3b82f6; background: #eff6ff; padding: 4px 10px; border-radius: 20px; }
+        .progress { background:#e5e7eb; height:10px; border-radius:10px; margin-top:15px; position: relative; }
+        .progress-bar { height:10px; background:#3b82f6; border-radius:10px; transition: width 1s ease-in-out; }
+        .loading { text-align: center; padding: 20px; color: #999; font-style: italic; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
-            <h1 class="text-xl font-bold text-blue-900">Komunitas Prestasi IPB</h1>
-            <nav class="hidden md:flex items-center gap-6">
-                <a href="#" class="font-semibold text-blue-600">Home</a>
-                <a href="#" class="hover:text-blue-600 transition">Informasi Lomba</a>
-                <a href="#" class="hover:text-blue-600 transition">Event</a>
-                <a href="#" class="hover:text-blue-600 transition">Fasilitas</a>
-                <a href="#" class="hover:text-blue-600 transition">About Us</a>
-                <a href="./login.html" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition block text-center">
-                Login
-                </a>
-            </nav>
-        </div>
-    </header>
+<body>
 
-    <section class="max-w-7xl mx-auto p-6 md:p-10">
-        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span class="w-2 h-8 bg-blue-600 rounded-full"></span> Cerita Komunitas Prestasi
-        </h2>
-        <div id="storyContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <p class="text-gray-400 animate-pulse">Memuat cerita...</p>
-        </div>
-    </section>
+<header class="navbar">
+    <div class="logo">Komunitas Prestasi IPB</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="#lomba">Informasi Lomba</a>
+        <a href="#event">Event</a>
+        <a href="#fasilitas">Fasilitas</a>
+        <a href="#about">About</a>
+        <a href="#faq">FAQ</a>
+        <button class="login" onclick="window.location.href='login.html'">Login</button>
+    </nav>
+</header>
 
-    <section class="max-w-7xl mx-auto p-6 md:p-10">
-        <h2 class="text-2xl font-bold mb-6">Capaian Prestasi Cluster</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div class="bg-pink-500 text-white p-6 rounded-2xl shadow-sm">
-                <p class="text-sm opacity-90">Olimpiade</p>
-                <p class="text-4xl font-black" id="olimpiadeCount">0</p>
-            </div>
-            <div class="bg-amber-400 text-white p-6 rounded-2xl shadow-sm">
-                <p class="text-sm opacity-90">Bisnis</p>
-                <p class="text-4xl font-black" id="bisnisCount">0</p>
-            </div>
-            <div class="bg-emerald-500 text-white p-6 rounded-2xl shadow-sm">
-                <p class="text-sm opacity-90">Penulisan</p>
-                <p class="text-4xl font-black" id="penulisanCount">0</p>
-            </div>
-            <div class="bg-blue-500 text-white p-6 rounded-2xl shadow-sm">
-                <p class="text-sm opacity-90">Desain</p>
-                <p class="text-4xl font-black" id="desainCount">0</p>
-            </div>
-        </div>
-    </section>
+<section class="story">
+    <h2>CERITA KOMUNITAS PRESTASI</h2>
+    <div id="storyContainer" class="story-container">
+        <p class="loading">Memuat cerita terbaru...</p>
+    </div>
+</section>
 
-    <section class="max-w-7xl mx-auto p-6 md:p-10 pb-20">
-        <h2 class="text-2xl font-bold mb-6">Top Leaderboard</h2>
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-gray-50 text-gray-500 text-sm">
-                        <th class="p-4 text-left">Rank</th>
-                        <th class="p-4 text-left">Nama</th>
-                        <th class="p-4 text-left">Cluster</th>
-                        <th class="p-4 text-right">Points</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard" class="divide-y divide-gray-100">
-                    </tbody>
-            </table>
-        </div>
-    </section>
+<section class="achievement">
+    <h2>Capaian Prestasi Cluster</h2>
+    <div class="cluster">
+        <div class="cluster-box pink">Olimpiade <span id="countOlimpiade">0</span></div>
+        <div class="cluster-box yellow">Bisnis <span id="countBisnis">0</span></div>
+        <div class="cluster-box green">Penulisan <span id="countPenulisan">0</span></div>
+        <div class="cluster-box blue">Desain <span id="countDesain">0</span></div>
+        <div class="cluster-box purple">Total <span id="countTotal">0</span></div>
+    </div>
+</section>
 
-    <script>
-        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co"
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"
-        
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
+<section class="leaderboard">
+    <h2>Top Leaderboard Anggota</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Nama</th>
+                <th>Cluster</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+            </tbody>
+    </table>
+</section>
 
-        // Inisialisasi Aplikasi
-        async function init() {
-            await Promise.all([
-                loadLeaderboard(),
-                loadStories(),
-                updateClusterStats()
-            ]);
-        }
+<section class="event">
+    <h2>Upcoming Event</h2>
+    <div id="eventContainer" class="event-container">
+        <p class="loading">Memuat event mendatang...</p>
+    </div>
+</section>
 
-        async function loadLeaderboard() {
-            const { data, error } = await _supabase
-                .from("members")
-                .select("*")
-                .order("points", { ascending: false })
-                .limit(5);
+<section class="project">
+    <h2>Project On Going</h2>
+    <div id="projectContainer" class="project-container">
+        <p class="loading">Memuat proyek kolaborasi...</p>
+    </div>
+</section>
 
-            if (error) return console.error("Leaderboard Error:", error);
+<script>
+    // Konfigurasi Supabase
+    const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co"
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-            const table = document.getElementById("leaderboard");
-            table.innerHTML = data.map((user, index) => `
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="p-4 font-bold text-blue-600">#${index + 1}</td>
-                    <td class="p-4 font-medium">${user.name}</td>
-                    <td class="p-4"><span class="px-3 py-1 bg-gray-100 rounded-full text-xs">${user.cluster}</span></td>
-                    <td class="p-4 text-right font-bold text-orange-500">${user.points}</td>
-                </tr>
-            `).join('');
-        }
+    async function init() {
+        await Promise.all([
+            loadStories(),
+            loadStats(),
+            loadLeaderboard(),
+            loadEvents(),
+            loadProjects()
+        ]);
+    }
 
-        async function loadStories() {
-            const { data, error } = await _supabase
-                .from("prestasi")
-                .select("*")
-                .order("created_at", { ascending: false })
-                .limit(6);
-            
-                console.log("Data prestasi dari Supabase:", data);
-            if (error) console.error("Error ambil cerita:", error);
-            
-            const container = document.getElementById("storyContainer");
-            
-            if (error) {
-                container.innerHTML = `<p class="text-red-500">Gagal memuat data.</p>`;
-                return;
-            }
+    // 1. Load Storytelling (10 Post Terakhir)
+    async function loadStories() {
+        const { data, error } = await _supabase
+            .from('prestasi')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        const container = document.getElementById('storyContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(item => `
+                <div class="story-card">
+                    <img src="${item.image || 'https://via.placeholder.com/400x200?text=AK62'}">
+                    <div class="story-text">
+                        <h3>${item.title}</h3>
+                        <p>${item.member_name} - ${item.cluster}</p>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = "<p>Belum ada cerita prestasi.</p>";
+        }
+    }
 
-            if (!data || data.length === 0) {
-                    container.innerHTML = `
-                        <p class="text-gray-400">
-                            Belum ada cerita prestasi.
-                        </p>
-                    `;
-                return;
-            }
+    // 2. Update Counter Cluster
+    async function loadStats() {
+        const { data } = await _supabase.from('prestasi').select('cluster');
+        const stats = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
+        
+        data.forEach(item => {
+            if (stats.hasOwnProperty(item.cluster)) stats[item.cluster]++;
+        });
 
-            container.innerHTML = data.map(post => `
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                    <img src="${post.image || 'https://via.placeholder.com/400x200'}" class="w-full h-48 object-cover">
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">${post.member_name || 'Member'}</span>
-                        <h3 class="font-bold text-lg mt-1">${post.title}</h3>
-                        <p class="text-sm text-gray-500 mt-2 line-clamp-3">${post.story}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
+        document.getElementById('countOlimpiade').innerText = stats.Olimpiade;
+        document.getElementById('countBisnis').innerText = stats.Bisnis;
+        document.getElementById('countPenulisan').innerText = stats.Penulisan;
+        document.getElementById('countDesain').innerText = stats.Desain;
+        document.getElementById('countTotal').innerText = data.length;
+    }
 
-        async function updateClusterStats() {
-        const { data, error } = await _supabase
-            .from("prestasi")
-            .select("cluster")
-    
-        if (error) {
-            console.error("Cluster error:", error)
-            return
-        }
-    
-        const counts = {
-            Olimpiade: 0,
-            Bisnis: 0,
-            Penulisan: 0,
-            Desain: 0
-        }
-    
-        data.forEach(item => {
-            const cluster = item.cluster
-            if (counts[cluster] !== undefined) {
-                counts[cluster]++
-            }
-        })
-    
-        document.getElementById("olimpiadeCount").innerText = counts.Olimpiade
-        document.getElementById("bisnisCount").innerText = counts.Bisnis
-        document.getElementById("penulisanCount").innerText = counts.Penulisan
-        document.getElementById("desainCount").innerText = counts.Desain
-    }
-        init();
-        
-    </script>
+    // 3. Load Leaderboard (Top 5)
+    async function loadLeaderboard() {
+        const { data } = await _supabase
+            .from('members')
+            .select('*')
+            .order('points', { ascending: false })
+            .limit(5);
+
+        const tableBody = document.getElementById('leaderboardBody');
+        tableBody.innerHTML = data.map((m, i) => `
+            <tr>
+                <td><b>#${i + 1}</b></td>
+                <td>${m.name}</td>
+                <td>${m.cluster}</td>
+                <td style="color:#facc15; font-weight:bold;">${m.points}</td>
+            </tr>
+        `).join('');
+    }
+
+    // 4. Load Upcoming Events
+    async function loadEvents() {
+        const { data } = await _supabase.from('events').select('*');
+        const container = document.getElementById('eventContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(ev => `
+                <div class="event-card">
+                    <img src="${ev.image_url || 'https://via.placeholder.com/200x300'}">
+                    <h3>${ev.title}</h3>
+                    <button onclick="window.open('${ev.registration_link}', '_blank')">Daftar</button>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = "<p>Tidak ada event terdekat.</p>";
+        }
+    }
+
+    // 5. Load Ongoing Projects (Progress 100/n)
+    async function loadProjects() {
+        const { data } = await _supabase.from('projects').select('*');
+        const container = document.getElementById('projectContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(p => {
+                const percent = Math.round((p.completed_milestones / p.total_milestones) * 100);
+                return `
+                    <div class="project-card">
+                        <span class="leader-tag">Leader: ${p.leader_name}</span>
+                        <h3 style="margin-top:10px">${p.title}</h3>
+                        <p style="font-size:12px; color:#666">${p.description}</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: ${percent}%"></div>
+                        </div>
+                        <p style="font-size:12px; margin-top:5px">Progress <b>${percent}%</b></p>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            container.innerHTML = "<p>Belum ada proyek on-going.</p>";
+        }
+    }
+
+    init();
+</script>
+
 </body>
-</html> 
+</html>
