@@ -1,196 +1,47 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aksara Karya 62 x Supabase</title>
+    <title>Aksara Karya 62 - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
-        .sidebar-item:hover { background: #f1f5f9; transform: translateX(5px); transition: all 0.3s; }
-    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800">
-
-    <div id="app" class="min-h-screen flex flex-col">
-        <nav class="bg-white p-4 shadow-sm flex justify-between items-center border-b border-blue-100 sticky top-0 z-50">
-            <h1 class="font-black text-blue-900 tracking-tighter text-xl uppercase">AK62 <span class="text-orange-500">Database</span></h1>
-            <div id="navItems" class="space-x-4">
-                <button onclick="showModal('login')" class="bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Login</button>
+<body class="bg-slate-50">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <div class="md:w-1/2 bg-blue-900 flex items-center justify-center p-12 relative overflow-hidden">
+            <div class="relative z-10 text-white">
+                <h1 class="text-5xl font-black mb-4">AK62 DATABASE</h1>
+                <p class="text-xl opacity-80">Sistem Informasi Prestasi & Manajemen Proyek Aksara Karya 62 IPB University.</p>
             </div>
-        </nav>
+            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-orange-500 rounded-full opacity-20"></div>
+        </div>
 
-        <main class="flex-1 flex overflow-hidden">
-            <aside id="sidebar" class="hidden w-64 border-r border-slate-200 p-6 space-y-2 bg-white overflow-y-auto">
-                </aside>
-
-            <div class="flex-1 overflow-y-auto p-6">
+        <div class="md:w-1/2 flex items-center justify-center p-8">
+            <div class="w-full max-w-md bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100">
+                <h2 class="text-3xl font-bold mb-2 text-blue-900 text-center">Selamat Datang</h2>
+                <p class="text-slate-400 text-center mb-8">Silakan masuk dengan email IPB dan kode anggota</p>
                 
-                <div id="homeView">
-                    <div class="bg-gradient-to-br from-blue-900 to-indigo-800 text-white p-10 rounded-3xl mb-10 relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h2 class="text-4xl font-bold mb-2 text-orange-400">Komunitas Prestasi IPB</h2>
-                            <p class="opacity-80 text-lg">Aksara Karya 62 - Mengukir prestasi dalam harmoni.</p>
-                        </div>
-                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white opacity-5 rounded-full"></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="md:col-span-2 space-y-6">
-                            <h3 class="text-xl font-bold border-l-4 border-orange-500 pl-3">Update Prestasi Terbaru</h3>
-                            <div id="achievementList" class="grid grid-cols-1 gap-4">
-                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                    <p class="text-slate-400 text-sm italic">Belum ada prestasi terbaru yang diupload.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white p-6 rounded-3xl shadow-sm h-fit">
-                            <h3 class="text-xl font-bold mb-4">🏆 Leaderboard</h3>
-                            <div id="leaderboardList" class="space-y-4">
-                                <p class="text-slate-400 text-xs">Memuat data peringkat...</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="space-y-4">
+                    <input type="email" id="email" placeholder="Email IPB (@apps.ipb.ac.id)" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border-none">
+                    <input type="password" id="password" placeholder="Kode Anggota" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border-none">
+                    <button onclick="handleLogin()" class="w-full bg-blue-900 text-white p-5 rounded-2xl font-bold hover:bg-black transition shadow-lg shadow-blue-100">MASUK KE DASHBOARD</button>
                 </div>
-
-                <div id="dashboardView" class="hidden">
-                    <div class="mb-8 p-8 bg-blue-900 rounded-[2rem] text-white">
-                        <h2 id="welcomeName" class="text-3xl font-bold">Halo, Juara!</h2>
-                        <p id="userRoleDetail" class="opacity-70 uppercase tracking-widest text-xs mt-1 font-bold"></p>
-                    </div>
-                    <div id="dynamicWidgets" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        </div>
-                </div>
-
             </div>
-        </main>
-    </div>
-
-    <div id="loginModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center backdrop-blur-sm z-50">
-        <div class="bg-white p-8 rounded-3xl w-96 shadow-2xl">
-            <h2 class="text-2xl font-bold mb-2 text-center text-blue-900">Selamat Datang</h2>
-            <p class="text-slate-500 text-center mb-6 text-sm">Masuk dengan akun Aksara Karya kamu</p>
-            <input type="email" id="email" placeholder="Email IPB" class="w-full mb-3 p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="password" id="password" placeholder="Kode Anggota" class="w-full mb-6 p-4 bg-slate-100 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="handleLogin()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-black transition">MASUK</button>
-            <button onclick="closeModal()" class="w-full mt-4 text-slate-400 text-sm">Tutup</button>
         </div>
     </div>
 
     <script>
-        // --- FUNGSI LOAD LEADERBOARD (TAMPILAN DEPAN) ---
-async function fetchLeaderboard() {
-    const { data, error } = await _supabase
-        .from('achievements')
-        .select('profiles(name, cluster)')
-        .limit(10);
-
-    if (data) {
-        const list = document.getElementById('leaderboardList');
-        list.innerHTML = data.map((item, index) => `
-            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-                <span class="text-sm font-bold">${index + 1}. ${item.profiles.name}</span>
-                <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold uppercase">${item.profiles.cluster}</span>
-            </div>
-        `).join('');
-    }
-}
-fetchLeaderboard(); // Jalankan saat web dibuka
-
-// --- UPDATE LOAD WIDGETS DENGAN KALENDER ---
-function loadWidgets() {
-    const widgets = document.getElementById('dynamicWidgets');
-    widgets.innerHTML = ""; 
-
-    if (currentUser.role.includes('member')) {
-        // Widget Upload & Proyek tetap ada (sesuai kode sebelumnya)
-        // ... (masukkan kode upload & proyek dari pesan sebelumnya di sini)
-
-        // TAMBAHKAN WIDGET MY PLAN (KALENDER)
-        widgets.innerHTML += `
-            <div class="col-span-full bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mt-6">
-                <h4 class="font-bold mb-4 flex items-center gap-2">📅 My Plan (Personal Notes)</h4>
-                <div id='calendar' class="text-xs h-[400px]"></div>
-                <p class="text-[10px] text-slate-400 mt-4">*Catatan ini hanya bisa dilihat oleh kamu sendiri.</p>
-            </div>
-        `;
-        
-        setTimeout(() => {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                themeSystem: 'standard',
-                events: [], // Kamu bisa simpan data note ke tabel 'my_plans' nanti
-                dateClick: function(info) {
-                    Swal.fire({
-                        title: 'Tambah Catatan',
-                        input: 'text',
-                        showCancelButton: true,
-                        confirmButtonText: 'Simpan',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            calendar.addEvent({ title: result.value, start: info.dateStr, allDay: true });
-                            // Logic: Di sini kamu bisa tambahkan _supabase.from('my_plans').insert(...)
-                        }
-                    });
-                }
-            });
-            calendar.render();
-        }, 500);
-    }
-
-    // DASHBOARD STAFF CDA
-    if (currentUser.role.includes('cda')) {
-        widgets.innerHTML += `
-            <div class="col-span-full bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                <h4 class="font-bold mb-4">Monitoring Anggota Cluster: ${currentUser.cluster.toUpperCase()}</h4>
-                <div id="memberList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    </div>
-            </div>
-        `;
-        loadClusterMembers();
-    }
-}
-
-// --- FUNGSI STAFF CDA: LIHAT ANGGOTA ---
-async function loadClusterMembers() {
-    const { data, error } = await _supabase
-        .from('profiles')
-        .select('*')
-        .eq('cluster', currentUser.cluster)
-        .eq('role', 'member');
-
-    if (data) {
-        document.getElementById('memberList').innerHTML = data.map(m => `
-            <div class="p-4 border rounded-2xl flex justify-between items-center">
-                <div>
-                    <p class="font-bold text-sm">${m.name}</p>
-                    <p class="text-[10px] text-slate-400">${m.email}</p>
-                </div>
-                <button class="bg-blue-50 text-blue-600 p-2 rounded-lg text-xs font-bold">Detail</button>
-            </div>
-        `).join('');
-    }
-}
-        
-        // --- KONFIGURASI SUPABASE ---
         const SB_URL = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
-        let completedCount = 0;
-
-        // --- AUTH LOGIC ---
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Karena kita pakai data CSV yang di-import ke tabel 'profiles', kita cek ke tabel tersebut
+            // Cek ke tabel profiles (Hasil import CSV)
             const { data, error } = await _supabase
                 .from('profiles')
                 .select('*')
@@ -199,144 +50,20 @@ async function loadClusterMembers() {
                 .single();
 
             if (data) {
-                currentUser = data;
-                Swal.fire('Berhasil!', `Selamat datang ${data.name}`, 'success');
-                closeModal();
-                renderDashboard();
+                localStorage.setItem('currentUser', JSON.stringify(data));
+                Swal.fire({ title: 'Berhasil!', text: 'Mengarahkan...', icon: 'success', timer: 1000, showConfirmButton: false });
+                
+                setTimeout(() => {
+                    if(data.role.toLowerCase().includes('member')) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'staff.html';
+                    }
+                }, 1000);
             } else {
-                Swal.fire('Gagal!', 'Email atau Kode Anggota salah!', 'error');
+                Swal.fire('Gagal!', 'Email atau Kode Anggota salah.', 'error');
             }
         }
-
-        function renderDashboard() {
-            document.getElementById('homeView').classList.add('hidden');
-            document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            
-            document.getElementById('navItems').innerHTML = `
-                <button onclick="location.reload()" class="text-red-500 font-bold text-sm">Logout</button>
-            `;
-
-            document.getElementById('welcomeName').innerText = `Halo, ${currentUser.name}!`;
-            document.getElementById('userRoleDetail').innerText = `${currentUser.role} | Cluster ${currentUser.cluster}`;
-            
-            setupSidebar();
-            loadWidgets();
-        }
-
-        function setupSidebar() {
-            let menu = `
-                <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Main Menu</div>
-                <a href="#" onclick="location.reload()" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-bold text-blue-900 bg-blue-50">
-                    <span>🏠</span> Home
-                </a>
-            `;
-
-            if (currentUser.role.includes('member')) {
-                menu += `
-                    <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-medium"><span>🏆</span> Upload Prestasi</a>
-                    <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-medium"><span>🚀</span> Proyek Saya</a>
-                    <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-medium"><span>📅</span> My Plan</a>
-                `;
-            } else if (currentUser.role.includes('cda')) {
-                menu += `
-                    <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-medium"><span>👥</span> Anggota Cluster</a>
-                    <a href="#" class="sidebar-item flex items-center gap-3 p-3 rounded-xl font-medium"><span>📢</span> Upload Event</a>
-                `;
-            }
-
-            document.getElementById('sidebar').innerHTML = menu;
-        }
-
-        function loadWidgets() {
-            const widgets = document.getElementById('dynamicWidgets');
-            widgets.innerHTML = ""; 
-
-            if (currentUser.role.includes('member')) {
-                // widget upload prestasi
-                widgets.innerHTML += `
-                    <div class="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                        <h4 class="font-bold mb-4 flex items-center gap-2">🏆 Upload Prestasi</h4>
-                        <div class="space-y-3">
-                            <input type="text" id="presTitle" placeholder="Nama Lomba" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm outline-none focus:ring-1 focus:ring-blue-500">
-                            <select id="presLevel" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm outline-none">
-                                <option>Internasional</option><option>Nasional</option><option>Provinsi</option><option>Univ/Internal</option>
-                            </select>
-                            <input type="text" id="presRank" placeholder="Juara Berapa?" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm outline-none">
-                            <textarea id="presStory" placeholder="Story telling singkat..." class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm h-20 outline-none"></textarea>
-                            <button onclick="submitPrestasi()" class="w-full bg-orange-500 text-white p-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition">SUBMIT</button>
-                        </div>
-                    </div>
-                `;
-
-                // widget proyek 100/n
-                widgets.innerHTML += `
-                    <div class="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                        <h4 class="font-bold mb-4 flex items-center gap-2">🚀 Proyek: <span id="projName" class="text-blue-600">IPB Makan</span></h4>
-                        <div id="timelineList" class="space-y-3 mb-4 text-sm max-h-40 overflow-y-auto"></div>
-                        <div class="pt-4 border-t">
-                            <div class="flex justify-between text-xs font-bold mb-2">
-                                <span>PROGRESS</span>
-                                <span id="percentText" class="text-green-600">0%</span>
-                            </div>
-                            <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                                <div id="progressBar" class="bg-green-500 h-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                renderTimeline(8); 
-            }
-        }
-
-        // --- LOGIKA PROGRESS ---
-        function renderTimeline(n) {
-            const container = document.getElementById('timelineList');
-            container.innerHTML = "";
-            for (let i = 1; i <= n; i++) {
-                container.innerHTML += `
-                    <div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
-                        <input type="checkbox" onchange="updateProgress(this, ${n})" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-slate-600 font-medium">Milestone Proyek ${i}</span>
-                    </div>
-                `;
-            }
-        }
-
-        function updateProgress(cb, total) {
-            if (cb.checked) completedCount++;
-            else completedCount--;
-            const percentage = (completedCount / total) * 100;
-            document.getElementById('progressBar').style.width = percentage + "%";
-            document.getElementById('percentText').innerText = Math.round(percentage) + "%";
-        }
-
-        // --- SUBMIT KE DATABASE ---
-        async function submitPrestasi() {
-            const title = document.getElementById('presTitle').value;
-            const level = document.getElementById('presLevel').value;
-            const rank = document.getElementById('presRank').value;
-            const story = document.getElementById('presStory').value;
-
-            if(!title) return Swal.fire('Oops!', 'Nama lomba wajib diisi', 'warning');
-
-            const { error } = await _supabase
-                .from('achievements')
-                .insert([{ 
-                    user_id: currentUser.id, title, level, rank, story, category: currentUser.cluster 
-                }]);
-
-            if (!error) {
-                Swal.fire('Berhasil!', 'Data tersimpan.', 'success');
-                document.getElementById('presTitle').value = "";
-            } else {
-                Swal.fire('Gagal', error.message, 'error');
-            }
-        }
-
-        // --- UTILS ---
-        function showModal(id) { document.getElementById(id + 'Modal').classList.remove('hidden'); }
-        function closeModal() { document.querySelectorAll('.fixed').forEach(m => m.classList.add('hidden')); }
     </script>
 </body>
 </html>
