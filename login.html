@@ -17,7 +17,7 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1 mb-1">Email IPB / Personal</label>
+                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest ml-1 mb-1">Email</label>
                 <input id="email" type="email" placeholder="nama@apps.ipb.ac.id" 
                     class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition font-medium">
             </div>
@@ -29,44 +29,20 @@
             </div>
 
             <button onclick="handleLogin()" id="btnLogin"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black p-5 rounded-2xl shadow-xl shadow-blue-200 transition active:scale-95 uppercase tracking-tight mt-2">
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black p-5 rounded-2xl shadow-xl shadow-blue-200 transition active:scale-95 uppercase mt-2">
                 Masuk Sekarang
             </button>
 
             <p id="errorMsg" class="text-center text-red-500 font-bold text-sm mt-2 min-h-[20px]"></p>
         </div>
-        
-        <div class="mt-8 text-center">
-            <p class="text-gray-400 text-xs font-medium italic">Aksara Karya 62 &copy; 2024</p>
-        </div>
     </div>
 
     <script>
-        // 1. CONFIG SUPABASE (Ganti dengan punyamu)
+        // CONFIG SUPABASE
         const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; 
+        const supabaseKey = "GANTI_DENGAN_ANON_KEY_KAMU"; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // 2. CEK APAKAH SUDAH LOGIN SEBELUMNYA
-        window.onload = () => {
-            const savedUser = localStorage.getItem("user");
-            if (savedUser) {
-                redirectUser(JSON.parse(savedUser).role);
-            }
-        };
-
-        // 3. FUNGSI REDIRECT BERDASARKAN ROLE
-        function redirectUser(role) {
-            const r = (role || "").toLowerCase();
-            if (r.includes("cda")) window.location.href = "dashboard-cda.html";
-            else if (r.includes("mbd")) window.location.href = "dashboard-mbd.html";
-            else if (r.includes("heg")) window.location.href = "dashboard-heg.html";
-            else if (r.includes("bph")) window.location.href = "dashboard-bph.html";
-            else if (r.includes("korvoks")) window.location.href = "dashboard-korvoks.html";
-            else window.location.href = "dashboard.html";
-        }
-
-        // 4. FUNGSI LOGIN UTAMA
         async function handleLogin() {
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
@@ -83,35 +59,41 @@
             errorMsg.innerText = "";
 
             try {
-                // Cari user di tabel members
+                // MENCARI DI TABEL 'profiles'
                 const { data, error } = await _supabase
-                    .from("members")
+                    .from("profiles") // <--- Nama tabel sudah diganti ke 'profiles'
                     .select("*")
                     .eq("email", email)
-                    .eq("password", password)
-                    .single(); // Gunakan single karena email harusnya unik
+                    .eq("password", password);
 
-                if (error || !data) {
-                    errorMsg.innerText = "Akun tidak ditemukan atau password salah.";
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const userAccount = data[0];
+                    localStorage.setItem("user", JSON.stringify(userAccount));
+                    
+                    // Logika Redirect berdasarkan kolom 'role' di tabel profiles
+                    const role = (userAccount.role || "").toLowerCase();
+
+                    if(role.includes("cda")) window.location.href = "dashboard-cda.html";
+                    else if(role.includes("mbd")) window.location.href = "dashboard-mbd.html";
+                    else if(role.includes("heg")) window.location.href = "dashboard-heg.html";
+                    else if(role.includes("bph")) window.location.href = "dashboard-bph.html";
+                    else window.location.href = "dashboard.html";
+
                 } else {
-                    // Simpan data ke browser
-                    localStorage.setItem("user", JSON.stringify(data));
-                    // Jalankan redirect
-                    redirectUser(data.role);
+                    errorMsg.innerText = "Akun tidak ditemukan atau password salah.";
                 }
             } catch (err) {
                 console.error(err);
-                errorMsg.innerText = "Gangguan koneksi ke database.";
+                errorMsg.innerText = "Error: " + err.message;
             } finally {
-                btn.innerText = "MASUK SEKARANG";
+                btn.innerText = "Masuk Sekarang";
                 btn.disabled = false;
             }
         }
 
-        // LOGIN DENGAN TOMBOL ENTER
-        document.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") handleLogin();
-        });
+        document.addEventListener("keypress", (e) => { if (e.key === "Enter") handleLogin(); });
     </script>
 </body>
 </html>
