@@ -2,37 +2,67 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Anggota - Aksara Karya 62</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .active-link { background-color: #F1F5F9; color: #2563EB; border-right: 4px solid #2563EB; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Style untuk tombol yang sedang aktif */
+        .active-link { 
+            background-color: #eff6ff; 
+            color: #2563eb; 
+            border-right: 4px solid #2563eb; 
+        }
+        .active-link i { color: #2563eb; }
+
+        /* Sembunyikan scrollbar iframe */
+        iframe::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-[#F8FAFC] flex min-h-screen font-sans">
+<body class="bg-[#F8FAFC] flex min-h-screen">
+
     <aside class="w-72 bg-white border-r border-gray-100 flex flex-col fixed h-full z-50">
         <div class="p-8 flex items-center space-x-3">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                 <i class="fa-solid fa-feather-pointed"></i>
             </div>
-            <h1 class="text-xl font-black text-blue-900 tracking-tighter uppercase">Aksara Karya</h1>
+            <div>
+                <h1 class="text-lg font-black text-blue-900 leading-none">AK62</h1>
+                <p class="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Portal Anggota</p>
+            </div>
         </div>
         
         <nav class="flex-1 px-4 space-y-2">
-            <button onclick="loadPage('upload-prestasi.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50 active-link">
-                <i class="fa-solid fa-trophy w-6 mr-3"></i> Upload Prestasi
+            <button onclick="loadPage('home-dashboard.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50 active-link">
+                <i class="fa-solid fa-house w-6 mr-3 text-gray-400"></i> Dashboard
             </button>
+            
+            <div class="pt-4 pb-2 px-4">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kontribusi</p>
+            </div>
+
+            <button onclick="loadPage('upload-prestasi.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
+                <i class="fa-solid fa-trophy w-6 mr-3 text-gray-400"></i> Upload Prestasi
+            </button>
+
             <button onclick="loadPage('upload-proyek.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
-                <i class="fa-solid fa-diagram-project w-6 mr-3"></i> Upload Proyek
+                <i class="fa-solid fa-diagram-project w-6 mr-3 text-gray-400"></i> Upload Proyek
             </button>
+
+            <div class="pt-4 pb-2 px-4">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Personal</p>
+            </div>
+
             <button onclick="loadPage('lomba-saya.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
-                <i class="fa-solid fa-flag-checkered w-6 mr-3"></i> Lomba Saya
+                <i class="fa-solid fa-flag-checkered w-6 mr-3 text-gray-400"></i> Lomba Saya
             </button>
-            <button onclick="loadPage('event-saya.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
-                <i class="fa-solid fa-calendar-check w-6 mr-3"></i> Event & Mentoring
-            </button>
+
             <button onclick="loadPage('my-plan.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
-                <i class="fa-solid fa-calendar-day w-6 mr-3"></i> My Plan
+                <i class="fa-solid fa-calendar-day w-6 mr-3 text-gray-400"></i> My Plan
             </button>
         </nav>
 
@@ -43,31 +73,53 @@
         </div>
     </aside>
 
-    <main class="ml-72 flex-1 relative h-screen">
-        <iframe id="content-frame" src="upload-prestasi.html" class="w-full h-full border-none"></iframe>
+    <main class="ml-72 flex-1 relative h-screen overflow-hidden">
+        <iframe id="content-frame" src="home-dashboard.html" class="w-full h-full border-none"></iframe>
     </main>
 
     <div id="logoutModal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white p-8 rounded-[2.5rem] max-w-sm w-full text-center shadow-2xl">
+        <div class="bg-white p-8 rounded-[2.5rem] max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
             <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
                 <i class="fa-solid fa-circle-exclamation"></i>
             </div>
             <h2 class="text-2xl font-black text-gray-800">Yakin ingin keluar?</h2>
-            <p class="text-gray-500 mt-2 mb-8">Kamu perlu login kembali untuk mengakses portal ini.</p>
+            <p class="text-gray-500 mt-2 mb-8 text-sm">Sesi kamu akan berakhir dan harus login kembali.</p>
             <div class="flex space-x-3">
                 <button onclick="closeLogoutModal()" class="flex-1 p-4 rounded-2xl bg-gray-100 font-bold text-gray-600 transition hover:bg-gray-200">Batal</button>
-                <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-600 font-bold text-white transition hover:bg-red-700 shadow-lg shadow-red-200">Ya, Keluar</button>
+                <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-600 font-bold text-white transition hover:bg-red-700 shadow-lg shadow-red-200">Keluar</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Cek Login saat halaman dimuat
+        window.onload = () => {
+            const user = localStorage.getItem("user");
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        };
+
+        // Fungsi pindah halaman iframe
         function loadPage(url, el) {
-            document.getElementById('content-frame').src = url;
-            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-link'));
+            const frame = document.getElementById('content-frame');
+            
+            // Efek transisi halus (opsional)
+            frame.style.opacity = "0";
+            
+            setTimeout(() => {
+                frame.src = url;
+                frame.style.opacity = "1";
+            }, 150);
+
+            // Update UI Sidebar (tombol aktif)
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('active-link');
+            });
             el.classList.add('active-link');
         }
 
+        // Fungsi Logout
         function showLogoutModal() { document.getElementById('logoutModal').classList.remove('hidden'); }
         function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
         function confirmLogout() {
