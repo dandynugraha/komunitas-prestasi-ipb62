@@ -9,17 +9,12 @@
         body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f5f6fb; color:#333; }
         
         /* NAVBAR */
-        .navbar{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        padding:15px 40px;
-        background:white;
-        box-shadow:0 3px 12px rgba(0,0,0,0.1);
-        position:sticky;
-        top:0;
-        z-index:50;
-}
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:white; box-shadow:0 3px 12px rgba(0,0,0,0.1); sticky top-0 z-50; }
+        .logo { font-weight:bold; font-size:20px; color:#1e3a8a; }
+        nav a { margin:0 10px; text-decoration:none; color:#333; font-weight:500; }
+        nav a:hover { color:#1e3a8a; }
+        .login { background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight: bold; }
+
         /* CERITA KOMUNITAS */
         .story { padding:40px; background:linear-gradient(90deg,#9c27b0,#2196f3); color:white; }
         .story h2 { margin-bottom:20px; }
@@ -171,36 +166,7 @@
 
     // 2. Update Counter Cluster
     async function loadStats() {
-    
-    const { data, error } = await _supabase
-    .from('prestasi')
-    .select('cluster');
-    
-    if(error || !data){
-    console.log("Stats error",error)
-    return
-    }
-    
-    const stats = {
-    Olimpiade:0,
-    Bisnis:0,
-    Penulisan:0,
-    Desain:0
-    }
-    
-    data.forEach(item=>{
-    if(stats[item.cluster]!==undefined){
-    stats[item.cluster]++
-    }
-    })
-    
-    document.getElementById('countOlimpiade').innerText=stats.Olimpiade
-    document.getElementById('countBisnis').innerText=stats.Bisnis
-    document.getElementById('countPenulisan').innerText=stats.Penulisan
-    document.getElementById('countDesain').innerText=stats.Desain
-    document.getElementById('countTotal').innerText=data.length
-    
-    }
+        const { data } = await _supabase.from('prestasi').select('cluster');
         const stats = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
         
         data.forEach(item => {
@@ -216,16 +182,11 @@
 
     // 3. Load Leaderboard (Top 5)
     async function loadLeaderboard() {
-        const { data, error } = await _supabase
-        .from('members')
-        .select('*')
-        .order('points',{ascending:false})
-        .limit(5)
-        
-        if(error || !data){
-        console.log(error)
-        return
-        }
+        const { data } = await _supabase
+            .from('members')
+            .select('*')
+            .order('points', { ascending: false })
+            .limit(5);
 
         const tableBody = document.getElementById('leaderboardBody');
         tableBody.innerHTML = data.map((m, i) => `
