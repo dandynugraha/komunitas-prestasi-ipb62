@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aksara Karya 62 x Supabase</title>
@@ -81,6 +82,101 @@
     </div>
 
     <script>
+        // --- FUNGSI LOAD LEADERBOARD (TAMPILAN DEPAN) ---
+async function fetchLeaderboard() {
+    const { data, error } = await _supabase
+        .from('achievements')
+        .select('profiles(name, cluster)')
+        .limit(10);
+
+    if (data) {
+        const list = document.getElementById('leaderboardList');
+        list.innerHTML = data.map((item, index) => `
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                <span class="text-sm font-bold">${index + 1}. ${item.profiles.name}</span>
+                <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold uppercase">${item.profiles.cluster}</span>
+            </div>
+        `).join('');
+    }
+}
+fetchLeaderboard(); // Jalankan saat web dibuka
+
+// --- UPDATE LOAD WIDGETS DENGAN KALENDER ---
+function loadWidgets() {
+    const widgets = document.getElementById('dynamicWidgets');
+    widgets.innerHTML = ""; 
+
+    if (currentUser.role.includes('member')) {
+        // Widget Upload & Proyek tetap ada (sesuai kode sebelumnya)
+        // ... (masukkan kode upload & proyek dari pesan sebelumnya di sini)
+
+        // TAMBAHKAN WIDGET MY PLAN (KALENDER)
+        widgets.innerHTML += `
+            <div class="col-span-full bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mt-6">
+                <h4 class="font-bold mb-4 flex items-center gap-2">📅 My Plan (Personal Notes)</h4>
+                <div id='calendar' class="text-xs h-[400px]"></div>
+                <p class="text-[10px] text-slate-400 mt-4">*Catatan ini hanya bisa dilihat oleh kamu sendiri.</p>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                themeSystem: 'standard',
+                events: [], // Kamu bisa simpan data note ke tabel 'my_plans' nanti
+                dateClick: function(info) {
+                    Swal.fire({
+                        title: 'Tambah Catatan',
+                        input: 'text',
+                        showCancelButton: true,
+                        confirmButtonText: 'Simpan',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            calendar.addEvent({ title: result.value, start: info.dateStr, allDay: true });
+                            // Logic: Di sini kamu bisa tambahkan _supabase.from('my_plans').insert(...)
+                        }
+                    });
+                }
+            });
+            calendar.render();
+        }, 500);
+    }
+
+    // DASHBOARD STAFF CDA
+    if (currentUser.role.includes('cda')) {
+        widgets.innerHTML += `
+            <div class="col-span-full bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <h4 class="font-bold mb-4">Monitoring Anggota Cluster: ${currentUser.cluster.toUpperCase()}</h4>
+                <div id="memberList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+        `;
+        loadClusterMembers();
+    }
+}
+
+// --- FUNGSI STAFF CDA: LIHAT ANGGOTA ---
+async function loadClusterMembers() {
+    const { data, error } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('cluster', currentUser.cluster)
+        .eq('role', 'member');
+
+    if (data) {
+        document.getElementById('memberList').innerHTML = data.map(m => `
+            <div class="p-4 border rounded-2xl flex justify-between items-center">
+                <div>
+                    <p class="font-bold text-sm">${m.name}</p>
+                    <p class="text-[10px] text-slate-400">${m.email}</p>
+                </div>
+                <button class="bg-blue-50 text-blue-600 p-2 rounded-lg text-xs font-bold">Detail</button>
+            </div>
+        `).join('');
+    }
+}
+        
         // --- KONFIGURASI SUPABASE ---
         const SB_URL = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
