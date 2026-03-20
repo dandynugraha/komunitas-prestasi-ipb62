@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="p-10 bg-[#F8FAFC]">
+    <h2 class="text-3xl font-black text-gray-900 mb-8">📅 Event & Mentoring Cluster</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm">
+            <img src="https://via.placeholder.com/600x400" alt="Poster Event" class="w-full h-64 object-cover">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <span class="bg-blue-100 text-blue-600 text-[10px] font-black uppercase px-3 py-1 rounded-full">Mentoring Cluster</span>
+                        <h3 class="text-xl font-black text-gray-800 mt-2">Optimalisasi UI/UX dalam Lomba Desain</h3>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm mb-6">Bersama Naufal Anbi, Head of Creative Division AK62. Kita akan bahas tuntas blueprint lomba.</p>
+                
+                <div class="space-y-3">
+                    <p class="text-sm font-bold"><i class="fa-solid fa-clock mr-2 text-blue-500"></i> 19 Maret 2024 | 19.30 WIB</p>
+                    <p class="text-sm font-bold"><i class="fa-solid fa-video mr-2 text-blue-500"></i> Live on Zoom Meeting</p>
+                </div>
+
+                <div class="mt-8 flex flex-col space-y-3">
+                    <button onclick="confirmEvent('Hadir')" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700">Konfirmasi Hadir</button>
+                    <button onclick="showAbsenReason()" class="w-full bg-gray-100 text-gray-600 p-4 rounded-2xl font-bold hover:bg-gray-200">Tidak Hadir</button>
+                </div>
+
+                <div id="reason-box" class="mt-4 hidden animate-pulse">
+                    <textarea id="alasan" placeholder="Sebutkan alasan tidak hadir..." class="w-full p-4 bg-red-50 rounded-2xl border border-red-100 outline-none text-sm"></textarea>
+                    <button onclick="confirmEvent('Absen')" class="mt-2 text-red-600 font-bold text-sm">Kirim Alasan ke Staff HEG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAbsenReason() { document.getElementById('reason-box').classList.toggle('hidden'); }
+        function confirmEvent(status) {
+            alert(`Terima kasih! Status [${status}] kamu telah masuk ke database Staff HEG.`);
+        }
+    </script>
+</body>
+</html>
