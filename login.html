@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Aksara Karya 62</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-black text-gray-800 tracking-tighter">AKSARA KARYA</h1>
+            <p class="text-gray-500">Masuk ke portal internal staf & anggota</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 ml-1">Email</label>
+                <input id="email" type="email" placeholder="nama@example.com" 
+                    class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 ml-1">Password</label>
+                <input id="password" type="password" placeholder="••••••••" 
+                    class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <button onclick="handleLogin()" id="btnLogin"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black p-4 rounded-2xl shadow-lg shadow-blue-200 transition active:scale-95">
+                MASUK SEKARANG
+            </button>
+
+            <p id="errorMsg" class="text-center text-red-500 font-medium text-sm mt-2"></p>
+        </div>
+    </div>
+
+    <script>
+        // 1. GANTI DENGAN URL & KEY SUPABASE KAMU
+        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function handleLogin() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const btn = document.getElementById("btnLogin");
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (!email || !password) {
+                errorMsg.innerText = "Email dan password wajib diisi!";
+                return;
+            }
+
+            btn.innerText = "Mengecek Akses...";
+            btn.disabled = true;
+            errorMsg.innerText = "";
+
+            try {
+                // Cari user di tabel members
+                const { data, error } = await _supabase
+                    .from("members")
+                    .select("*")
+                    .eq("email", email)
+                    .eq("password", password);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const userAccount = data[0];
+                    
+                    // Simpan data user ke browser
+                    localStorage.setItem("user", JSON.stringify(userAccount));
+
+                    // LOGIKA REDIRECT BERDASARKAN ROLE
+                    // Kita buat lowercase agar tidak sensitif huruf besar/kecil
+                    const role = userAccount.role.toLowerCase();
+
+                    if (role.includes('cda')) {
+                        window.location.href = "dashboard-cda.html";
+                    } 
+                    else if (role.includes('mbd')) {
+                        window.location.href = "dashboard-mbd.html";
+                    } 
+                    else if (role.includes('heg')) {
+                        window.location.href = "dashboard-heg.html";
+                    } 
+                    else if (role.includes('bph')) {
+                        window.location.href = "dashboard-bph.html";
+                    }
+                    else if (role.includes('korvoks')) {
+                        window.location.href = "dashboard-korvoks.html";
+                    }
+                    else {
+                        // Jika role 'member' atau lainnya
+                        window.location.href = "dashboard.html";
+                    }
+
+                } else {
+                    errorMsg.innerText = "Email atau Password salah!";
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.innerText = "Terjadi gangguan server.";
+            } finally {
+                btn.innerText = "MASUK SEKARANG";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
