@@ -15,21 +15,22 @@
             <input id="foto" placeholder="Link Foto Landscape (Bukti URL)" class="md:col-span-2 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-blue-500">
             <input id="tanggal" type="date" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
 
-            <select id="title" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
-                <option>Juara 1</option>
-                <option>Juara 2</option>
-                <option>Juara 3</option>
-                <option>Harapan 1</option>
-                <option>Harapan 2</option>
-                <option>Harapan 3</option>
-                <option>Honorable</option>
+            <select id="title" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 font-bold">
+                <option value="Juara 1">Juara 1</option>
+                <option value="Juara 2">Juara 2</option>
+                <option value="Juara 3">Juara 3</option>
+                <option value="Harapan 1">Harapan 1</option>
+                <option value="Harapan 2">Harapan 2</option>
+                <option value="Harapan 3">Harapan 3</option>
+                <option value="Honorable Mention">Honorable Mention</option>
+                <option value="Finalis">Finalis / Peserta</option>
             </select>
             
-            <select id="tingkat" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
-                <option>Internasional</option>
-                <option>Nasional</option>
-                <option>Provinsi</option>
-                <option>Universitas</option>
+            <select id="tingkat" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 font-bold">
+                <option value="Internasional">Internasional</option>
+                <option value="Nasional">Nasional</option>
+                <option value="Provinsi">Provinsi</option>
+                <option value="Universitas">Universitas</option>
             </select>
 
             <select id="metode" onchange="updatePlaceholder()" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
@@ -57,10 +58,22 @@
     </div>
 
     <script>
-        // CONFIG SUPABASE
         const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; // MASUKKAN ANON KEY KAMU
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // 1. FUNGSI HITUNG POIN (LOGIKA SISTEM POIN)
+        function getPoints(tingkat, juara) {
+            const skor = {
+                'Internasional': { 'Juara 1': 500, 'Juara 2': 400, 'Juara 3': 300, 'Lainnya': 150 },
+                'Nasional':      { 'Juara 1': 300, 'Juara 2': 200, 'Juara 3': 150, 'Lainnya': 75 },
+                'Provinsi':      { 'Juara 1': 150, 'Juara 2': 100, 'Juara 3': 75,  'Lainnya': 40 },
+                'Universitas':   { 'Juara 1': 100, 'Juara 2': 75,  'Juara 3': 50,  'Lainnya': 20 }
+            };
+
+            let kategoriJuara = juara.includes('Juara') ? juara : 'Lainnya';
+            return skor[tingkat][kategoriJuara] || 10;
+        }
 
         function updatePlaceholder() {
             const m = document.getElementById('metode').value;
@@ -73,35 +86,61 @@
             if(!user) return alert("Sesi berakhir, silakan login kembali.");
 
             const btn = document.getElementById('btnUpload');
+            const tingkat = document.getElementById('tingkat').value;
+            const juara = document.getElementById('title').value;
+            
+            // Hitung poin yang didapat
+            const pointsEarned = getPoints(tingkat, juara);
+
             const data = {
-                title: document.getElementById('title').value,
+                title: juara,
                 foto_url: document.getElementById('foto').value,
                 tanggal: document.getElementById('tanggal').value,
-                tingkat: document.getElementById('tingkat').value,
+                tingkat: tingkat,
                 metode: document.getElementById('metode').value,
                 lokasi: document.getElementById('lokasi').value,
                 cluster: document.getElementById('cluster_lomba').value,
                 story: document.getElementById('story').value,
                 email_user: user.email,
-                nama_user: user.full_name || user.email,
-                created_at: new Date()
+                nama_user: user.name || user.email,
+                points_given: pointsEarned // Simpan riwayat poin di tabel prestasi
             };
 
-            if(!data.title || !data.cluster) return alert("Harap isi Judul dan Bidang Lomba!");
+            if(!data.cluster) return alert("Harap pilih Cluster Lomba!");
 
-            btn.innerText = "Sedang Mempublish...";
+            btn.innerText = `Menghitung +${pointsEarned} Poin...`;
             btn.disabled = true;
 
-            const { error } = await _supabase.from('prestasi').insert([data]);
+            try {
+                // A. Insert ke tabel prestasi
+                const { error: err1 } = await _supabase.from('prestasi').insert([data]);
+                if(err1) throw err1;
 
-            if(error) {
-                alert("Gagal: " + error.message);
-            } else {
-                alert("Selamat! Prestasi kamu berhasil dipublish.");
+                // B. Update total poin di profil user
+                const currentPoints = parseInt(user.points || 0);
+                const newTotal = currentPoints + pointsEarned;
+
+                const { error: err2 } = await _supabase
+                    .from('profiles')
+                    .update({ points: newTotal })
+                    .eq('email', user.email);
+
+                if(err2) throw err2;
+
+                // C. Update Local Storage agar dashboard lokal juga terupdate
+                user.points = newTotal;
+                localStorage.setItem("user", JSON.stringify(user));
+
+                alert(`🎉 Berhasil! Kamu mendapatkan +${pointsEarned} Poin dan prestasi telah dipublish!`);
                 window.location.reload();
+
+            } catch (err) {
+                alert("Terjadi kesalahan: " + err.message);
+                console.error(err);
+            } finally {
+                btn.innerText = "Upload & Publish ke Home";
+                btn.disabled = false;
             }
-            btn.innerText = "Upload & Publish ke Home";
-            btn.disabled = false;
         }
     </script>
 </body>
