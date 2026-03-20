@@ -1,14 +1,77 @@
-<nav class="space-y-2">
-    <a href="#prestasi" class="block p-3 hover:bg-blue-800 rounded-xl">🏆 Upload Prestasi</a>
-    <a href="#divisi" id="divisiMenu" class="block p-3 bg-orange-500 rounded-xl font-bold">Divisi Saya</a>
-    </nav>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard - AK62</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 flex min-h-screen">
+    <aside class="w-64 bg-slate-900 text-white p-6 sticky top-0 h-screen">
+        <h2 class="font-black text-xl mb-10 text-orange-400 uppercase tracking-tighter">Staff Panel</h2>
+        <nav class="space-y-2" id="staffMenu"></nav>
+        <button onclick="logout()" class="block w-full text-left p-3 text-red-400 hover:bg-red-900/30 rounded-xl mt-20">Logout</button>
+    </aside>
 
-<script>
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    // Logika Filter Divisi
-    document.getElementById('divisiMenu').innerText = `Menu ${user.role.toUpperCase()}`;
-    
-    // Jika HEG: Tampilkan List Semua Anggota (Keaktifan)
-    // Jika CDA: Tampilkan List Anggota Cluster tertentu
-    // Jika MBD: Tampilkan List Request Desain (COPM)
-</script>
+    <main class="flex-1 p-8">
+        <div id="header" class="mb-10">
+            <h1 id="staffName" class="text-3xl font-bold text-slate-800">Panel Staff</h1>
+            <div id="badgeRole" class="mt-2 inline-block px-4 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-black uppercase"></div>
+        </div>
+
+        <div id="staffContent" class="grid grid-cols-1 gap-8">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h3 id="divisiTitle" class="text-xl font-bold mb-6">Monitoring Anggota</h3>
+                <div id="dataList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SB_URL = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if(!user) window.location.href = 'index.html';
+
+        document.getElementById('staffName').innerText = user.name;
+        document.getElementById('badgeRole').innerText = user.role;
+
+        const menu = document.getElementById('staffMenu');
+        const role = user.role.toLowerCase();
+
+        // Menu Logic
+        if(role.includes('cda')) {
+            menu.innerHTML = `<a href="#" class="block p-3 bg-blue-600 rounded-xl font-bold">👥 Anggota Cluster</a>`;
+            loadMembersByCluster(user.cluster);
+        } else if(role.includes('heg')) {
+            menu.innerHTML = `<a href="#" class="block p-3 bg-blue-600 rounded-xl font-bold">📊 Data Keaktifan</a>`;
+            loadAllMembers();
+        } else if(role.includes('mbd')) {
+            menu.innerHTML = `<a href="#" class="block p-3 bg-blue-600 rounded-xl font-bold">🎨 Request Desain (COPM)</a>`;
+            loadDesignRequests();
+        }
+
+        async function loadMembersByCluster(cluster) {
+            const { data } = await _supabase.from('profiles').select('*').eq('cluster', cluster).eq('role', 'member');
+            renderData(data);
+        }
+
+        function renderData(data) {
+            const container = document.getElementById('dataList');
+            container.innerHTML = data.map(m => `
+                <div class="p-5 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
+                    <div class="w-12 h-12 bg-white rounded-2xl shadow-sm mb-3 flex items-center justify-center font-bold text-blue-900">${m.name.charAt(0)}</div>
+                    <p class="font-bold text-sm">${m.name}</p>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase font-bold">${m.cluster}</p>
+                    <button class="mt-4 w-full py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black hover:bg-blue-900 hover:text-white transition">LIHAT PROGRES</button>
+                </div>
+            `).join('');
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+    </script>
+</body>
+</html>
