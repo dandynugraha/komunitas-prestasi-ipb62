@@ -6,158 +6,141 @@
     <title>Aksara Karya 62 - Komunitas Prestasi IPB</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
-        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: bold; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+        .stat-card { transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-[#F8FAFC]">
 
-    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
-            <h1 class="text-xl font-black text-blue-900 tracking-tighter">AK62 DATABASE</h1>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-                <a href="#home" class="text-blue-600">Home</a>
-                <a href="#lomba" class="hover:text-blue-600 transition">Informasi Lomba</a>
-                <a href="#event" class="hover:text-blue-600 transition">Event</a>
-                <a href="#about" class="hover:text-blue-600 transition">About Us</a>
-                <a href="./login.html" class="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-black transition">Login</a>
-            </nav>
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">A</div>
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">AK62 <span class="text-blue-600">DATABASE</span></h1>
+            </div>
+            <div class="hidden md:flex items-center gap-8 font-semibold text-sm text-slate-600">
+                <a href="#" class="text-blue-600">Home</a>
+                <a href="#" class="hover:text-blue-600">Info Lomba</a>
+                <a href="#" class="hover:text-blue-600">Event</a>
+                <a href="#" class="hover:text-blue-600">About Us</a>
+                <a href="login.html" class="bg-blue-600 text-white px-6 py-2.5 rounded-full hover:bg-slate-900 transition shadow-lg shadow-blue-100">Login</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section id="home" class="max-w-7xl mx-auto p-6 mt-6">
-        <div class="flex justify-between items-end mb-8">
-            <h2 class="text-3xl font-bold italic tracking-tighter">#CeritaAksara <span class="text-blue-600 text-lg not-italic font-normal block opacity-50">10 Capaian Terakhir Anggota & Staff</span></h2>
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="relative h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl mb-12">
+            <img src="Frame 2 (1).jpg" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-transparent flex flex-col justify-center px-12 text-white">
+                <span class="bg-blue-500 w-fit px-4 py-1 rounded-full text-xs font-bold mb-4">EST. 2024</span>
+                <h2 class="text-5xl font-extrabold leading-tight mb-4">Komunitas Prestasi<br>IPB University</h2>
+                <p class="text-blue-100 max-w-md opacity-80">Wadah kolaborasi mahasiwa IPB dalam meraih prestasi di bidang Bisnis, Desain, Olimpiade, dan Penulisan.</p>
+            </div>
         </div>
-        <div id="storyContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <p class="text-slate-400 animate-pulse">Menghubungkan ke database...</p>
-        </div>
-    </section>
 
-    <section class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div class="lg:col-span-2">
-            <h2 class="text-2xl font-bold mb-6">Distribusi Prestasi</h2>
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-10">
-                <div class="w-64 h-64"><canvas id="clusterChart"></canvas></div>
-                <div class="grid grid-cols-2 gap-4 flex-1">
-                    <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100" onclick="filterByCluster('Olimpiade')">
-                        <p class="text-xs font-bold text-pink-600">Olimpiade</p>
-                        <p class="text-3xl font-black" id="countOlimpiade">0</p>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100">
+                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mb-4">🏆</div>
+                <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Olimpiade</p>
+                <h3 class="text-4xl font-black text-slate-900 mt-1" id="olimpiadeCount">0</h3>
+            </div>
+            <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4">💼</div>
+                <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Bisnis</p>
+                <h3 class="text-4xl font-black text-slate-900 mt-1" id="bisnisCount">0</h3>
+            </div>
+            <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">✍️</div>
+                <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Penulisan</p>
+                <h3 class="text-4xl font-black text-slate-900 mt-1" id="penulisanCount">0</h3>
+            </div>
+            <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4">🎨</div>
+                <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Desain</p>
+                <h3 class="text-4xl font-black text-slate-900 mt-1" id="desainCount">0</h3>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-8 flex items-center gap-3">
+                    <span class="w-2 h-8 bg-blue-600 rounded-full"></span>
+                    Cerita Capaian Terbaru
+                </h2>
+                <div id="storyContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     </div>
-                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100" onclick="filterByCluster('Bisnis')">
-                        <p class="text-xs font-bold text-amber-600">Bisnis</p>
-                        <p class="text-3xl font-black" id="countBisnis">0</p>
-                    </div>
-                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100" onclick="filterByCluster('Penulisan')">
-                        <p class="text-xs font-bold text-emerald-600">Penulisan</p>
-                        <p class="text-3xl font-black" id="countPenulisan">0</p>
-                    </div>
-                    <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100" onclick="filterByCluster('Desain')">
-                        <p class="text-xs font-bold text-blue-600">Desain</p>
-                        <p class="text-3xl font-black" id="countDesain">0</p>
+            </div>
+
+            <div class="space-y-12">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mb-8 italic">Top Rank</h2>
+                    <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100">
+                        <div id="leaderboardList" class="space-y-4">
+                            </div>
+                        <button class="w-full mt-6 py-4 bg-slate-50 rounded-2xl text-xs font-bold text-blue-600 hover:bg-blue-50 transition">LIHAT SEMUA RANKING</button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div>
-            <h2 class="text-2xl font-bold mb-6">Leaderboard</h2>
-            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div class="flex border-b text-[10px] font-bold uppercase tracking-widest">
-                    <button class="flex-1 py-3 tab-active" onclick="showLeaderboard('points')">Umum</button>
-                    <button class="flex-1 py-3 text-slate-400" onclick="showLeaderboard('activity')">Aktif</button>
-                </div>
-                <div id="leaderboardList" class="p-4 space-y-3">
+                <div id="projectStatus">
                     </div>
             </div>
         </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto p-6 mb-20">
-        <h2 class="text-2xl font-bold mb-6 italic">#ProyekKolaborasi</h2>
-        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            </div>
-    </section>
+    </main>
 
     <script>
         const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co"
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function init() {
-            loadStories();
-            loadStats();
-            loadLeaderboard('points');
-            loadProjects();
-        }
-
-        async function loadStories() {
-            const { data } = await _supabase.from("prestasi").select("*").order("created_at", { ascending: false }).limit(10);
+        async function loadContent() {
+            // Load Stories
+            const { data: prestasi } = await _supabase.from("prestasi").select("*").order("created_at", { ascending: false }).limit(10);
             const container = document.getElementById("storyContainer");
-            container.innerHTML = data.map(p => `
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group">
-                    <div class="h-48 overflow-hidden"><img src="${p.image || 'https://via.placeholder.com/400x200'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></div>
-                    <div class="p-6">
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-tighter">${p.cluster}</span>
-                        <h3 class="font-bold text-lg leading-tight mt-1">${p.title}</h3>
-                        <p class="text-slate-500 text-xs mt-3 line-clamp-3">${p.story}</p>
+            container.innerHTML = prestasi.map(p => `
+                <div class="group bg-white rounded-[2rem] overflow-hidden border border-slate-100 hover:shadow-xl transition-all duration-500">
+                    <div class="h-56 overflow-hidden relative">
+                        <img src="${p.image || 'https://via.placeholder.com/400x300'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-black text-blue-900 uppercase">${p.cluster}</div>
+                    </div>
+                    <div class="p-8">
+                        <h3 class="font-bold text-xl leading-snug group-hover:text-blue-600 transition">${p.title}</h3>
+                        <p class="text-slate-500 text-sm mt-4 line-clamp-3 leading-relaxed">${p.story}</p>
+                        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-slate-50">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-[10px] font-bold text-blue-600">${p.member_name.charAt(0)}</div>
+                            <span class="text-xs font-bold text-slate-700">${p.member_name}</span>
+                        </div>
                     </div>
                 </div>
             `).join('');
-        }
 
-        async function loadStats() {
-            const { data } = await _supabase.from("prestasi").select("cluster");
+            // Load Leaderboard
+            const { data: members } = await _supabase.from("members").select("*").order("points", { ascending: false }).limit(5);
+            document.getElementById('leaderboardList').innerHTML = members.map((m, i) => `
+                <div class="flex items-center gap-4 group">
+                    <div class="w-10 h-10 flex items-center justify-center font-black text-slate-300 group-hover:text-blue-600 transition">0${i+1}</div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-slate-800">${m.name}</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${m.cluster}</p>
+                    </div>
+                    <div class="text-sm font-black text-orange-500">${m.points}</div>
+                </div>
+            `).join('');
+
+            // Update Counts
             const counts = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
-            data.forEach(d => counts[d.cluster]++);
-
-            document.getElementById('countOlimpiade').innerText = counts.Olimpiade;
-            document.getElementById('countBisnis').innerText = counts.Bisnis;
-            document.getElementById('countPenulisan').innerText = counts.Penulisan;
-            document.getElementById('countDesain').innerText = counts.Desain;
-
-            new Chart(document.getElementById('clusterChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(counts),
-                    datasets: [{ data: Object.values(counts), backgroundColor: ['#ec4899', '#fbbf24', '#10b981', '#3b82f6'], borderWeight: 0 }]
-                },
-                options: { plugins: { legend: { display: false } }, cutout: '70%' }
+            prestasi.forEach(item => counts[item.cluster]++);
+            Object.keys(counts).forEach(c => {
+                const el = document.getElementById(c.toLowerCase() + 'Count');
+                if(el) el.innerText = counts[c];
             });
         }
 
-        async function loadLeaderboard(type) {
-            const { data } = await _supabase.from("members").select("*").order(type, { ascending: false }).limit(5);
-            document.getElementById('leaderboardList').innerHTML = data.map((m, i) => `
-                <div class="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-2xl transition">
-                    <span class="font-black text-blue-200 text-xl">#${i+1}</span>
-                    <div class="flex-1">
-                        <p class="font-bold text-sm">${m.name}</p>
-                        <p class="text-[9px] text-slate-400 uppercase font-black">${m.cluster}</p>
-                    </div>
-                    <span class="text-sm font-black text-orange-500">${m[type]}</span>
-                </div>
-            `).join('');
-        }
-
-        async function loadProjects() {
-            // Mock data, nanti ambil dari tabel 'projects'
-            const projects = [{ title: "IPB Makan", leader: "Dandy", progress: 75, desc: "Platform katering mahasiswa" }];
-            document.getElementById('projectContainer').innerHTML = projects.map(p => `
-                <div class="bg-blue-900 text-white p-8 rounded-[2.5rem] relative overflow-hidden">
-                    <h3 class="text-2xl font-bold mb-2">${p.title}</h3>
-                    <p class="text-blue-300 text-xs mb-6">Ketua: ${p.leader} • ${p.desc}</p>
-                    <div class="w-full bg-blue-800 h-2 rounded-full overflow-hidden">
-                        <div class="bg-orange-400 h-full" style="width: ${p.progress}%"></div>
-                    </div>
-                    <p class="text-[10px] mt-2 font-bold text-right">${p.progress}% PROGRESS</p>
-                </div>
-            `).join('');
-        }
-
-        init();
+        loadContent();
     </script>
 </body>
 </html>
