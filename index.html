@@ -1,168 +1,247 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Komunitas Prestasi IPB</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f5f6fb; color:#333; }
-        .navbar { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:white; box-shadow:0 3px 12px rgba(0,0,0,0.1); position: sticky; top:0; z-50; }
-        .logo { font-weight:bold; font-size:20px; color:#1e3a8a; }
-        nav a { margin:0 10px; text-decoration:none; color:#333; font-weight:500; }
-        .login { background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight: bold; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komunitas Prestasi IPB</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f5f6fb; color:#333; }
+        
+        /* NAVBAR */
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:white; box-shadow:0 3px 12px rgba(0,0,0,0.1); sticky top-0 z-50; }
+        .logo { font-weight:bold; font-size:20px; color:#1e3a8a; }
+        nav a { margin:0 10px; text-decoration:none; color:#333; font-weight:500; }
+        nav a:hover { color:#1e3a8a; }
+        .login { background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight: bold; }
 
-        /* CERITA KOMUNITAS */
-        .story { padding:40px; background:linear-gradient(90deg,#9c27b0,#2196f3); color:white; }
-        .story h2 { margin-bottom:20px; font-weight: 900; }
-        .story-container { display:flex; gap:20px; overflow-x:auto; padding-bottom: 20px; }
-        .story-card { min-width:280px; background:white; border-radius:15px; overflow:hidden; color:black; box-shadow:0 6px 15px rgba(0,0,0,0.15); }
-        .story-card img { width:100%; height:160px; object-fit:cover; background: #eee; }
-        .story-text { padding:15px; }
-        .story-text h3 { margin: 0; font-size: 16px; color: #1e3a8a; font-weight: 800; }
-        .story-text p { font-size: 13px; color: #666; margin-top: 5px; font-weight: 600; }
+        /* CERITA KOMUNITAS */
+        .story { padding:40px; background:linear-gradient(90deg,#9c27b0,#2196f3); color:white; }
+        .story h2 { margin-bottom:20px; }
+        .story-container { display:flex; gap:20px; overflow-x:auto; padding-bottom: 10px; }
+        .story-card { min-width:280px; background:white; border-radius:15px; overflow:hidden; color:black; box-shadow:0 6px 15px rgba(0,0,0,0.15); }
+        .story-card img { width:100%; height:160px; object-fit:cover; }
+        .story-text { padding:15px; }
+        .story-text h3 { margin: 0; font-size: 16px; color: #1e3a8a; }
+        .story-text p { font-size: 13px; color: #666; margin-top: 5px; }
 
-        /* CAPAIAN PRESTASI */
-        .achievement { padding:40px; }
-        .cluster { display:flex; gap:20px; flex-wrap:wrap; }
-        .cluster-box { padding:20px; border-radius:12px; color:white; font-weight:bold; font-size:18px; min-width:160px; flex: 1; }
-        .cluster-box span { display:block; font-size:30px; margin-top:5px; }
-        .pink { background:#ff7eb3; } .yellow { background:#facc15; } .green { background:#22c55e; } .blue { background:#3b82f6; } .purple { background:#9333ea; }
+        /* CAPAIAN PRESTASI */
+        .achievement { padding:40px; }
+        .cluster { display:flex; gap:20px; flex-wrap:wrap; }
+        .cluster-box { padding:20px; border-radius:12px; color:white; font-weight:bold; font-size:18px; min-width:160px; flex: 1; }
+        .cluster-box span { display:block; font-size:30px; margin-top:5px; }
+        .pink { background:#ff7eb3; } .yellow { background:#facc15; } .green { background:#22c55e; } .blue { background:#3b82f6; } .purple { background:#9333ea; }
 
-        /* LEADERBOARD */
-        .leaderboard { padding:40px; }
-        .leaderboard table { width:100%; border-collapse:collapse; background:white; border-radius:20px; overflow:hidden; box-shadow:0 5px 12px rgba(0,0,0,0.05); }
-        th { background:#1e3a8a; color:white; padding:15px; text-align:left; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-        td { padding:15px; border-bottom: 1px solid #f1f5f9; }
-        tr:hover { background: #f8fafc; }
+        /* LEADERBOARD */
+        .leaderboard { padding:40px; }
+        .leaderboard table { width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; box-shadow:0 5px 12px rgba(0,0,0,0.1); }
+        th { background:#1e3a8a; color:white; padding:12px; text-align:left; }
+        td { padding:12px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background:#f1f5f9; }
 
-        .loading { text-align: center; padding: 20px; color: #fff; font-weight: bold; }
-    </style>
+        /* UPCOMING EVENT */
+        .event { padding:40px; }
+        .event-container { display:flex; gap:20px; flex-wrap:wrap; }
+        .event-card { background:white; padding:15px; border-radius:15px; width:220px; text-align:center; box-shadow:0 6px 15px rgba(0,0,0,0.1); }
+        .event-card img { width:100%; border-radius:10px; height: 280px; object-fit: cover; }
+        .event-card button { margin-top:10px; background:#1e3a8a; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; width: 100%; font-weight: bold; }
+
+        /* PROJECT */
+        .project { padding:40px; }
+        .project-container { display:flex; gap:20px; flex-wrap:wrap; }
+        .project-card { background:white; padding:20px; border-radius:15px; width:300px; box-shadow:0 6px 15px rgba(0,0,0,0.1); }
+        .project-card h3 { color: #1e3a8a; margin-top: 0; }
+        .leader-tag { font-size: 12px; font-weight: bold; color: #3b82f6; background: #eff6ff; padding: 4px 10px; border-radius: 20px; }
+        .progress { background:#e5e7eb; height:10px; border-radius:10px; margin-top:15px; position: relative; }
+        .progress-bar { height:10px; background:#3b82f6; border-radius:10px; transition: width 1s ease-in-out; }
+        .loading { text-align: center; padding: 20px; color: #999; font-style: italic; }
+    </style>
 </head>
+
 <body>
 
-<header class="navbar">
-    <div class="logo">AK62 PRESTASI</div>
-    <nav>
-        <a href="#">Home</a>
-        <a href="#lomba">Lomba</a>
-        <a href="#event">Event</a>
-        <button class="login" onclick="window.location.href='login.html'">Login Internal</button>
-    </nav>
+<header class="navbar" style="padding: 10px 40px; justify-content: space-between;">
+
+    <div class="logo-container" style="display: flex; items-center: center; gap: 15px;">
+        <img src="Frame 3 (1).html.png" style="height: 60px; object-fit: contain;">
+    </div>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#lomba">Informasi Lomba</a>
+        <a href="#event">Event</a>
+        <a href="#fasilitas">Fasilitas</a>
+        <a href="#about">About</a>
+        <a href="#faq">FAQ</a>
+        <button class="login" onclick="window.location.href='login.html'">Login</button>
+    </nav>
 </header>
 
 <section class="story">
-    <h2>CERITA PRESTASI TERBARU</h2>
-    <div id="storyContainer" class="story-container">
-        <p class="loading">Memuat prestasi...</p>
-    </div>
+    <h2>CERITA KOMUNITAS PRESTASI</h2>
+    <div id="storyContainer" class="story-container">
+        <p class="loading">Memuat cerita terbaru...</p>
+    </div>
 </section>
 
 <section class="achievement">
-    <h2>Capaian Prestasi Cluster</h2>
-    <div class="cluster">
-        <div class="cluster-box pink">Olimpiade <span id="countOlimpiade">0</span></div>
-        <div class="cluster-box yellow">Bisnis <span id="countBisnis">0</span></div>
-        <div class="cluster-box green">Penulisan <span id="countPenulisan">0</span></div>
-        <div class="cluster-box blue">Desain <span id="countDesain">0</span></div>
-        <div class="cluster-box purple">Total <span id="countTotal">0</span></div>
-    </div>
+    <h2>Capaian Prestasi Cluster</h2>
+    <div class="cluster">
+        <div class="cluster-box pink">Olimpiade <span id="countOlimpiade">0</span></div>
+        <div class="cluster-box yellow">Bisnis <span id="countBisnis">0</span></div>
+        <div class="cluster-box green">Penulisan <span id="countPenulisan">0</span></div>
+        <div class="cluster-box blue">Desain <span id="countDesain">0</span></div>
+        <div class="cluster-box purple">Total <span id="countTotal">0</span></div>
+    </div>
 </section>
 
 <section class="leaderboard">
-    <h2>🏆 Top Leaderboard</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Nama Anggota</th>
-                <th>Cluster</th>
-                <th>Total Poin</th>
-            </tr>
-        </thead>
-        <tbody id="leaderboardBody">
-            <tr><td colspan="4" style="text-align:center">Memuat peringkat...</td></tr>
-        </tbody>
-    </table>
+    <h2>Top Leaderboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Nama</th>
+                <th>Cluster</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+            </tbody>
+    </table>
+</section>
+
+<section class="event">
+    <h2>Upcoming Event</h2>
+    <div id="eventContainer" class="event-container">
+        <p class="loading">Memuat event mendatang...</p>
+    </div>
+</section>
+
+<section class="project">
+    <h2>Project On Going</h2>
+    <div id="projectContainer" class="project-container">
+        <p class="loading">Memuat proyek kolaborasi...</p>
+    </div>
 </section>
 
 <script>
-    const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // Konfigurasi Supabase
+    const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co"
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function init() {
-        loadStories();
-        loadStats();
-        loadLeaderboard();
-    }
+    async function init() {
+        await Promise.all([
+            loadStories(),
+            loadStats(),
+            loadLeaderboard(),
+            loadEvents(),
+            loadProjects()
+        ]);
+    }
 
-    // 1. LOAD CERITA PRESTASI (Tabel: prestasi)
-    async function loadStories() {
-        const { data, error } = await _supabase
-            .from('prestasi')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10);
-        
-        const container = document.getElementById('storyContainer');
-        if (data && data.length > 0) {
-            container.innerHTML = data.map(item => `
-                <div class="story-card">
-                    <img src="${item.foto_url || 'https://via.placeholder.com/400x200?text=AK62+Prestasi'}">
-                    <div class="story-text">
-                        <h3>${item.title}</h3>
-                        <p>${item.nama_user || 'Anggota AK62'} • ${item.cluster}</p>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = "<p>Belum ada upload prestasi terbaru.</p>";
-        }
-    }
+    // 1. Load Storytelling (10 Post Terakhir)
+    async function loadStories() {
+        const { data, error } = await _supabase
+            .from('prestasi')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        const container = document.getElementById('storyContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(item => `
+                <div class="story-card">
+                    <img src="${item.image || 'https://via.placeholder.com/400x200?text=AK62'}">
+                    <div class="story-text">
+                        <h3>${item.title}</h3>
+                        <p>${item.member_name} - ${item.cluster}</p>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = "<p>Belum ada cerita prestasi.</p>";
+        }
+    }
 
-    // 2. LOAD STATS (Tabel: prestasi)
-    async function loadStats() {
-        const { data } = await _supabase.from('prestasi').select('cluster');
-        if(!data) return;
+    // 2. Update Counter Cluster
+    async function loadStats() {
+        const { data } = await _supabase.from('prestasi').select('cluster');
+        const stats = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
+        
+        data.forEach(item => {
+            if (stats.hasOwnProperty(item.cluster)) stats[item.cluster]++;
+        });
 
-        const stats = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
-        data.forEach(item => {
-            if (stats.hasOwnProperty(item.cluster)) stats[item.cluster]++;
-        });
+        document.getElementById('countOlimpiade').innerText = stats.Olimpiade;
+        document.getElementById('countBisnis').innerText = stats.Bisnis;
+        document.getElementById('countPenulisan').innerText = stats.Penulisan;
+        document.getElementById('countDesain').innerText = stats.Desain;
+        document.getElementById('countTotal').innerText = data.length;
+    }
 
-        document.getElementById('countOlimpiade').innerText = stats.Olimpiade;
-        document.getElementById('countBisnis').innerText = stats.Bisnis;
-        document.getElementById('countPenulisan').innerText = stats.Penulisan;
-        document.getElementById('countDesain').innerText = stats.Desain;
-        document.getElementById('countTotal').innerText = data.length;
-    }
+    // 3. Load Leaderboard (Top 5)
+    async function loadLeaderboard() {
+        const { data } = await _supabase
+            .from('members')
+            .select('*')
+            .order('points', { ascending: false })
+            .limit(5);
 
-    // 3. LOAD LEADERBOARD (Tabel: profiles - BUKAN members)
-    async function loadLeaderboard() {
-        const { data, error } = await _supabase
-            .from('profiles') // Ganti dari 'members' ke 'profiles'
-            .select('full_name, name, cluster, points')
-            .order('points', { ascending: false })
-            .limit(10);
+        const tableBody = document.getElementById('leaderboardBody');
+        tableBody.innerHTML = data.map((m, i) => `
+            <tr>
+                <td><b>#${i + 1}</b></td>
+                <td>${m.name}</td>
+                <td>${m.cluster}</td>
+                <td style="color:#facc15; font-weight:bold;">${m.points}</td>
+            </tr>
+        `).join('');
+    }
 
-        const tableBody = document.getElementById('leaderboardBody');
-        
-        if (data && data.length > 0) {
-            tableBody.innerHTML = data.map((m, i) => `
-                <tr>
-                    <td><span style="background:#1e3a8a; color:white; padding:4px 10px; border-radius:8px;">#${i + 1}</span></td>
-                    <td style="font-weight:bold">${m.full_name || m.name || 'User'}</td>
-                    <td>${m.cluster || 'General'}</td>
-                    <td style="color:#1e3a8a; font-weight:black; font-size:18px;">${m.points || 0} <small style="font-size:10px text-gray-400">PTS</small></td>
-                </tr>
-            `).join('');
-        } else {
-            tableBody.innerHTML = "<tr><td colspan='4' style='text-align:center'>Belum ada data poin.</td></tr>";
-        }
-    }
+    // 4. Load Upcoming Events
+    async function loadEvents() {
+        const { data } = await _supabase.from('events').select('*');
+        const container = document.getElementById('eventContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(ev => `
+                <div class="event-card">
+                    <img src="${ev.image_url || 'https://via.placeholder.com/200x300'}">
+                    <h3>${ev.title}</h3>
+                    <button onclick="window.open('${ev.registration_link}', '_blank')">Daftar</button>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = "<p>Tidak ada event terdekat.</p>";
+        }
+    }
 
-    init();
+    // 5. Load Ongoing Projects (Progress 100/n)
+    async function loadProjects() {
+        const { data } = await _supabase.from('projects').select('*');
+        const container = document.getElementById('projectContainer');
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(p => {
+                const percent = Math.round((p.completed_milestones / p.total_milestones) * 100);
+                return `
+                    <div class="project-card">
+                        <span class="leader-tag">Leader: ${p.leader_name}</span>
+                        <h3 style="margin-top:10px">${p.title}</h3>
+                        <p style="font-size:12px; color:#666">${p.description}</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: ${percent}%"></div>
+                        </div>
+                        <p style="font-size:12px; margin-top:5px">Progress <b>${percent}%</b></p>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            container.innerHTML = "<p>Belum ada proyek on-going.</p>";
+        }
+    }
+
+    init();
 </script>
+
 </body>
 </html>
