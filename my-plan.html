@@ -1,67 +1,96 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <title>My Plan - AK62</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="p-10 bg-[#F8FAFC]">
-    <div class="flex items-center space-x-4 mb-8">
-        <div class="w-12 h-12 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-lg"><i class="fa-solid fa-calendar-day"></i></div>
-        <h2 class="text-3xl font-black text-gray-900 italic">📅 My Personal Plan</h2>
-    </div>
-
-    <div class="grid grid-cols-3 gap-8">
-        <div class="col-span-2 bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Maret 2024</h3>
-                <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-lg">‹</button>
-                    <button class="p-2 hover:bg-gray-100 rounded-lg">›</button>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <h2 class="text-xl font-black mb-6 italic text-gray-800">📅 Kalender Rencana (Pribadi)</h2>
+            <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-400 mb-4">
+                <div>MIN</div><div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
+            </div>
+            <div class="grid grid-cols-7 gap-3" id="calendar-grid">
                 </div>
-            </div>
-            <div class="grid grid-cols-7 gap-3 text-center">
-                <div class="text-xs font-bold text-gray-400 uppercase">Min</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Sen</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Sel</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Rab</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Kam</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Jum</div>
-                <div class="text-xs font-bold text-gray-400 uppercase">Sab</div>
-                
-                <script>
-                    for(let i=1; i<=31; i++) {
-                        const active = i === 15 ? 'bg-blue-600 text-white ring-4 ring-blue-100' : 'bg-gray-50 text-gray-700 hover:bg-blue-50';
-                        document.write(`<div class="h-16 ${active} rounded-2xl flex flex-col items-center justify-center cursor-pointer transition font-bold">
-                            ${i}
-                            ${i === 15 ? '<span class="w-1.5 h-1.5 bg-white rounded-full mt-1"></span>' : ''}
-                        </div>`);
-                    }
-                </script>
-            </div>
         </div>
 
-        <div class="space-y-6">
-            <div class="bg-blue-900 p-8 rounded-[3rem] text-white shadow-2xl shadow-blue-200">
-                <h4 class="font-black text-lg mb-4 flex items-center"><i class="fa-solid fa-bell mr-2"></i> Reminder Email</h4>
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs opacity-60 font-bold uppercase tracking-widest">Pilih Tanggal</label>
-                        <input type="date" class="w-full bg-blue-800 p-4 rounded-2xl border-none text-white mt-1 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-xs opacity-60 font-bold uppercase tracking-widest">Catatan Agenda</label>
-                        <textarea placeholder="Contoh: DL Lomba Pilmapres" class="w-full bg-blue-800 p-4 rounded-2xl h-32 border-none text-white mt-1 outline-none resize-none"></textarea>
-                    </div>
-                    <button onclick="alert('Notifikasi H-1 & Hari-H Aktif via Email!')" class="w-full bg-white text-blue-900 p-4 rounded-2xl font-black transition hover:bg-blue-50 active:scale-95">
-                        AKTIFKAN REMINDER
-                    </button>
-                </div>
-            </div>
+        <div class="bg-blue-900 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-blue-200 h-fit">
+            <p class="font-black mb-6 flex items-center"><i class="fa-solid fa-bell mr-2"></i> Set Reminder Email</p>
             
-            <div class="bg-white p-6 rounded-[2rem] border border-gray-100 italic text-sm text-gray-400">
-                <i class="fa-solid fa-lock mr-2"></i> Hanya kamu yang dapat melihat rencana ini. Staff tidak memiliki akses ke My Plan kamu.
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="block opacity-70 mb-1">Tanggal Terpilih</label>
+                    <input id="plan-date" type="date" class="w-full bg-blue-800 p-4 rounded-2xl border-none text-white outline-none">
+                </div>
+                <div>
+                    <label class="block opacity-70 mb-1">Catatan Rencana</label>
+                    <textarea id="plan-note" placeholder="Apa rencana kamu besok? (Contoh: Deadline Proposal PIMNAS)" class="w-full bg-blue-800 p-4 rounded-2xl h-40 border-none text-white outline-none resize-none"></textarea>
+                </div>
+                <button onclick="savePlan()" id="btnSave" class="w-full bg-blue-500 hover:bg-blue-400 p-5 rounded-2xl font-black transition shadow-lg active:scale-95">
+                    Aktifkan Reminder
+                </button>
             </div>
         </div>
     </div>
+
+    <script>
+        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Render Kalender
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = "";
+            for(let i=1; i<=31; i++) {
+                const day = document.createElement('div');
+                day.className = "h-14 bg-gray-50 flex items-center justify-center rounded-2xl hover:bg-blue-100 cursor-pointer transition font-bold text-gray-600";
+                day.innerText = i;
+                day.onclick = () => {
+                    // Reset style
+                    document.querySelectorAll('#calendar-grid div').forEach(d => d.classList.remove('bg-blue-600', 'text-white'));
+                    // Set active
+                    day.classList.add('bg-blue-600', 'text-white');
+                    // Format tanggal (asumsi Maret 2024)
+                    const formattedDate = `2024-03-${i.toString().padStart(2, '0')}`;
+                    document.getElementById('plan-date').value = formattedDate;
+                };
+                grid.appendChild(day);
+            }
+        }
+
+        async function savePlan() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const date = document.getElementById('plan-date').value;
+            const note = document.getElementById('plan-note').value;
+
+            if(!date || !note) return alert("Pilih tanggal dan isi catatan!");
+
+            const btn = document.getElementById('btnSave');
+            btn.innerText = "Menyimpan...";
+
+            const { error } = await _supabase.from('user_plans').insert([{
+                user_id: user.id,
+                email: user.email,
+                tanggal: date,
+                catatan: note
+            }]);
+
+            if(!error) {
+                alert("Reminder Aktif! Notifikasi akan dikirim h-1 ke email kamu.");
+                document.getElementById('plan-note').value = "";
+            } else {
+                alert("Gagal simpan: " + error.message);
+            }
+            btn.innerText = "Aktifkan Reminder";
+        }
+
+        renderCalendar();
+    </script>
 </body>
 </html>
