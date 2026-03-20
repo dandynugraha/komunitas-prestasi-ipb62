@@ -1,0 +1,14 @@
+<nav class="space-y-2">
+    <a href="#prestasi" class="block p-3 hover:bg-blue-800 rounded-xl">🏆 Upload Prestasi</a>
+    <a href="#divisi" id="divisiMenu" class="block p-3 bg-orange-500 rounded-xl font-bold">Divisi Saya</a>
+    </nav>
+
+<script>
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    // Logika Filter Divisi
+    document.getElementById('divisiMenu').innerText = `Menu ${user.role.toUpperCase()}`;
+    
+    // Jika HEG: Tampilkan List Semua Anggota (Keaktifan)
+    // Jika CDA: Tampilkan List Anggota Cluster tertentu
+    // Jika MBD: Tampilkan List Request Desain (COPM)
+</script>
