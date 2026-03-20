@@ -1,118 +1,61 @@
 <!DOCTYPE html>
-<html lang="id">
+
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Member Dashboard - AK62</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<title>Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 flex min-h-screen">
-    <aside class="w-64 bg-blue-900 text-white p-6 sticky top-0 h-screen hidden md:block">
-        <h2 class="font-black text-xl mb-10 tracking-tighter">AK62 MEMBER</h2>
-        <nav class="space-y-2">
-            <a href="#" class="block p-3 bg-blue-800 rounded-xl font-bold">🏠 Dashboard</a>
-            <a href="#" class="block p-3 hover:bg-blue-800 rounded-xl transition">🏆 Upload Prestasi</a>
-            <a href="#" class="block p-3 hover:bg-blue-800 rounded-xl transition">🚀 Proyek Saya</a>
-            <a href="#" class="block p-3 hover:bg-blue-800 rounded-xl transition">📌 My Plan</a>
-            <button onclick="logout()" class="block w-full text-left p-3 text-red-400 hover:bg-red-900/30 rounded-xl mt-20">Logout</button>
-        </nav>
-    </aside>
 
-    <main class="flex-1 p-8">
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 id="userName" class="text-3xl font-bold text-blue-900">Halo!</h1>
-                <p id="userCluster" class="text-slate-500 uppercase tracking-widest text-xs font-bold mt-1"></p>
-            </div>
-            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl" id="avatar"></div>
-        </header>
+<body>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">🏆 Form Prestasi</h3>
-                <div class="space-y-4">
-                    <input type="text" id="presTitle" placeholder="Nama Lomba" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-1 focus:ring-blue-500">
-                    <div class="grid grid-cols-2 gap-4">
-                        <select id="presLevel" class="p-4 bg-slate-50 rounded-2xl outline-none">
-                            <option>Nasional</option><option>Internasional</option><option>Univ</option>
-                        </select>
-                        <input type="text" id="presRank" placeholder="Juara Ke-" class="p-4 bg-slate-50 rounded-2xl outline-none">
-                    </div>
-                    <textarea id="presStory" placeholder="Ceritakan pengalamanmu..." class="w-full p-4 bg-slate-50 rounded-2xl outline-none h-32"></textarea>
-                    <button onclick="submitPrestasi()" class="w-full bg-blue-900 text-white p-4 rounded-2xl font-bold">SIMPAN PRESTASI</button>
-                </div>
-            </div>
+<h2>Dashboard</h2>
 
-            <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">🚀 Proyek: <span class="text-blue-600">IPB Makan</span></h3>
-                <div id="timelineContainer" class="space-y-3 mb-6 max-h-48 overflow-y-auto pr-2"></div>
-                <div class="pt-6 border-t">
-                    <div class="flex justify-between text-xs font-black mb-2">
-                        <span class="text-slate-400">TOTAL PROGRES</span>
-                        <span id="percentText" class="text-green-600 text-sm">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
-                        <div id="progressBar" class="bg-green-500 h-full transition-all duration-700" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
+<input id="title" placeholder="judul">
+<input id="image" placeholder="link gambar">
+<input id="rank" placeholder="juara">
+<input id="location" placeholder="lokasi">
 
-            <div class="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                <h3 class="text-lg font-bold mb-6">📅 My Plan (Kalender Catatan)</h3>
-                <div id="calendar" class="h-[500px]"></div>
-            </div>
-        </div>
-    </main>
+<select id="cluster">
+<option>Bisnis</option>
+<option>Desain</option>
+<option>Olimpiade</option>
+<option>Penulisan</option>
+</select>
 
-    <script>
-        const SB_URL = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+<textarea id="story"></textarea>
 
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if(!user) window.location.href = 'index.html';
+<button onclick="upload()">Upload Prestasi</button>
 
-        document.getElementById('userName').innerText = `Halo, ${user.name}!`;
-        document.getElementById('userCluster').innerText = `Cluster ${user.cluster}`;
-        document.getElementById('avatar').innerText = user.name.charAt(0);
+<script>
 
-        // --- PROGRESS LOGIC ---
-        let completed = 0;
-        const totalMilestones = 8;
-        const timeline = document.getElementById('timelineContainer');
-        for(let i=1; i<=totalMilestones; i++) {
-            timeline.innerHTML += `
-                <div class="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition border border-transparent hover:border-slate-100">
-                    <input type="checkbox" onchange="updateProgress(this)" class="w-5 h-5 rounded-lg border-slate-300 text-blue-600">
-                    <span class="text-sm text-slate-600 font-medium">Milestone ${i}: Persiapan Proyek</span>
-                </div>
-            `;
-        }
+const supabase = supabase.createClient(
+"https://uaygxlfwrsbjfsjmfpum.supabase.co",
+"ANON_KEY_KAMU"
+)
 
-        function updateProgress(cb) {
-            cb.checked ? completed++ : completed--;
-            const percent = (completed / totalMilestones) * 100;
-            document.getElementById('progressBar').style.width = percent + '%';
-            document.getElementById('percentText').innerText = Math.round(percent) + '%';
-        }
+const user=JSON.parse(localStorage.getItem("user"))
 
-        // --- CALENDAR ---
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                themeSystem: 'standard',
-                dateClick: function(info) {
-                    Swal.fire({ title: 'Rencana Baru', input: 'text', showCancelButton: true })
-                    .then(res => { if(res.value) calendar.addEvent({ title: res.value, start: info.dateStr }); });
-                }
-            });
-            calendar.render();
-        });
+if(!user){
+location.href="login.html"
+}
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-    </script>
+async function upload(){
+
+await supabase.from("prestasi").insert([{
+title:document.getElementById("title").value,
+image:document.getElementById("image").value,
+rank:document.getElementById("rank").value,
+location:document.getElementById("location").value,
+cluster:document.getElementById("cluster").value,
+story:document.getElementById("story").value,
+member_name:user.name
+}])
+
+alert("berhasil")
+
+}
+
+</script>
+
 </body>
 </html>
