@@ -61,6 +61,104 @@
     </div>
 
     <script>
+        // Ganti fungsi loadWidgets yang lama dengan ini
+function loadWidgets() {
+    const widgets = document.getElementById('dynamicWidgets');
+    widgets.innerHTML = ""; 
+
+    if (currentUser.role.includes('member')) {
+        // --- WIDGET UPLOAD PRESTASI ---
+        widgets.innerHTML += `
+            <div class="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+                <h4 class="font-bold mb-4 flex items-center gap-2">Upload Prestasi</h4>
+                <div class="space-y-3">
+                    <input type="text" id="presTitle" placeholder="Nama Lomba" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm">
+                    <select id="presLevel" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm">
+                        <option>Internasional</option>
+                        <option>Nasional</option>
+                        <option>Provinsi</option>
+                        <option>Univ/Internal</option>
+                    </select>
+                    <input type="text" id="presRank" placeholder="Juara Berapa? (Contoh: Juara 1)" class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm">
+                    <textarea id="presStory" placeholder="Story telling singkat..." class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm h-20"></textarea>
+                    <button onclick="submitPrestasi()" class="w-full bg-orange-500 text-white p-3 rounded-xl font-bold text-sm">SUBMIT PRESTASI</button>
+                </div>
+            </div>
+        `;
+
+        // --- WIDGET PROGRES PROYEK (100/N Logic) ---
+        widgets.innerHTML += `
+            <div class="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+                <h4 class="font-bold mb-4 flex items-center gap-2">🚀 Proyek: <span id="projName">IPB Makan</span></h4>
+                <div id="timelineList" class="space-y-3 mb-4 text-sm">
+                    </div>
+                <div class="pt-4 border-t">
+                    <div class="flex justify-between text-xs font-bold mb-2">
+                        <span>TOTAL PROGRESS</span>
+                        <span id="percentText">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                        <div id="progressBar" class="bg-green-500 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        renderTimeline(8); // Contoh 8 milestone seperti request-mu
+    }
+}
+
+// --- LOGIKA SUBMIT PRESTASI ---
+async function submitPrestasi() {
+    const title = document.getElementById('presTitle').value;
+    const level = document.getElementById('presLevel').value;
+    const rank = document.getElementById('presRank').value;
+    const story = document.getElementById('presStory').value;
+
+    const { data, error } = await supabase
+        .from('achievements')
+        .insert([
+            { 
+                user_id: currentUser.id, 
+                title: title, 
+                level: level, 
+                rank: rank, 
+                story: story,
+                category: currentUser.cluster 
+            }
+        ]);
+
+    if (!error) {
+        Swal.fire('Berhasil!', 'Prestasi kamu sudah masuk ke leaderboard.', 'success');
+        // Kosongkan form
+        document.getElementById('presTitle').value = "";
+    } else {
+        Swal.fire('Gagal', error.message, 'error');
+    }
+}
+
+// --- LOGIKA TIMELINE (100/N) ---
+let completedCount = 0;
+function renderTimeline(n) {
+    const container = document.getElementById('timelineList');
+    container.innerHTML = "";
+    for (let i = 1; i <= n; i++) {
+        container.innerHTML += `
+            <div class="flex items-center gap-3">
+                <input type="checkbox" onchange="updateProgress(this, ${n})" class="w-4 h-4 rounded text-blue-600">
+                <span class="text-slate-600">Milestone ${i}</span>
+            </div>
+        `;
+    }
+}
+
+function updateProgress(cb, total) {
+    if (cb.checked) completedCount++;
+    else completedCount--;
+
+    const percentage = (completedCount / total) * 100;
+    document.getElementById('progressBar').style.width = percentage + "%";
+    document.getElementById('percentText').innerText = Math.round(percentage) + "%";
+}
         // CONFIG SUPABASE (GANTI DENGAN PUNYA KAMU)
         const SB_URL = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
