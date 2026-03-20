@@ -1,61 +1,79 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="id">
 <head>
-<title>Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <title>Dashboard Anggota - Aksara Karya 62</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .active-link { background-color: #F1F5F9; color: #2563EB; border-right: 4px solid #2563EB; }
+    </style>
 </head>
+<body class="bg-[#F8FAFC] flex min-h-screen font-sans">
+    <aside class="w-72 bg-white border-r border-gray-100 flex flex-col fixed h-full z-50">
+        <div class="p-8 flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+            <h1 class="text-xl font-black text-blue-900 tracking-tighter uppercase">Aksara Karya</h1>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="loadPage('upload-prestasi.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50 active-link">
+                <i class="fa-solid fa-trophy w-6 mr-3"></i> Upload Prestasi
+            </button>
+            <button onclick="loadPage('upload-proyek.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
+                <i class="fa-solid fa-diagram-project w-6 mr-3"></i> Upload Proyek
+            </button>
+            <button onclick="loadPage('lomba-saya.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
+                <i class="fa-solid fa-flag-checkered w-6 mr-3"></i> Lomba Saya
+            </button>
+            <button onclick="loadPage('event-saya.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
+                <i class="fa-solid fa-calendar-check w-6 mr-3"></i> Event & Mentoring
+            </button>
+            <button onclick="loadPage('my-plan.html', this)" class="w-full flex items-center p-4 rounded-xl text-gray-500 font-bold transition hover:bg-gray-50">
+                <i class="fa-solid fa-calendar-day w-6 mr-3"></i> My Plan
+            </button>
+        </nav>
 
-<body>
+        <div class="p-6 border-t border-gray-50">
+            <button onclick="showLogoutModal()" class="w-full flex items-center p-4 text-red-500 font-bold hover:bg-red-50 rounded-xl transition">
+                <i class="fa-solid fa-power-off mr-3"></i> Keluar Akun
+            </button>
+        </div>
+    </aside>
 
-<h2>Dashboard</h2>
+    <main class="ml-72 flex-1 relative h-screen">
+        <iframe id="content-frame" src="upload-prestasi.html" class="w-full h-full border-none"></iframe>
+    </main>
 
-<input id="title" placeholder="judul">
-<input id="image" placeholder="link gambar">
-<input id="rank" placeholder="juara">
-<input id="location" placeholder="lokasi">
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-[2.5rem] max-w-sm w-full text-center shadow-2xl">
+            <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h2 class="text-2xl font-black text-gray-800">Yakin ingin keluar?</h2>
+            <p class="text-gray-500 mt-2 mb-8">Kamu perlu login kembali untuk mengakses portal ini.</p>
+            <div class="flex space-x-3">
+                <button onclick="closeLogoutModal()" class="flex-1 p-4 rounded-2xl bg-gray-100 font-bold text-gray-600 transition hover:bg-gray-200">Batal</button>
+                <button onclick="confirmLogout()" class="flex-1 p-4 rounded-2xl bg-red-600 font-bold text-white transition hover:bg-red-700 shadow-lg shadow-red-200">Ya, Keluar</button>
+            </div>
+        </div>
+    </div>
 
-<select id="cluster">
-<option>Bisnis</option>
-<option>Desain</option>
-<option>Olimpiade</option>
-<option>Penulisan</option>
-</select>
+    <script>
+        function loadPage(url, el) {
+            document.getElementById('content-frame').src = url;
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-link'));
+            el.classList.add('active-link');
+        }
 
-<textarea id="story"></textarea>
-
-<button onclick="upload()">Upload Prestasi</button>
-
-<script>
-
-const supabase = supabase.createClient(
-"https://uaygxlfwrsbjfsjmfpum.supabase.co",
-"ANON_KEY_KAMU"
-)
-
-const user=JSON.parse(localStorage.getItem("user"))
-
-if(!user){
-location.href="login.html"
-}
-
-async function upload(){
-
-await supabase.from("prestasi").insert([{
-title:document.getElementById("title").value,
-image:document.getElementById("image").value,
-rank:document.getElementById("rank").value,
-location:document.getElementById("location").value,
-cluster:document.getElementById("cluster").value,
-story:document.getElementById("story").value,
-member_name:user.name
-}])
-
-alert("berhasil")
-
-}
-
-</script>
-
+        function showLogoutModal() { document.getElementById('logoutModal').classList.remove('hidden'); }
+        function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
+        function confirmLogout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
