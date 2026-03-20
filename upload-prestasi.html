@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Prestasi - AK62</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="p-10 bg-[#F8FAFC]">
+    <div class="max-w-4xl bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 mx-auto">
+        <h2 class="text-2xl font-black text-blue-900 mb-8"><i class="fa-solid fa-trophy mr-3"></i> Lapor Prestasi Baru</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input id="foto" placeholder="Link Foto Landscape (Bukti URL)" class="md:col-span-2 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 focus:ring-2 focus:ring-blue-500">
+            <input id="title" placeholder="Title Prestasi (Juara 1...)" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
+            <input id="tanggal" type="date" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
+            
+            <select id="tingkat" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
+                <option>Internasional</option>
+                <option>Nasional</option>
+                <option>Provinsi</option>
+                <option>Universitas</option>
+            </select>
+
+            <select id="metode" onchange="updatePlaceholder()" class="p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
+                <option value="offline">Offline</option>
+                <option value="online">Online</option>
+                <option value="hybrid">Hybrid</option>
+            </select>
+
+            <input id="lokasi" placeholder="Nama Tempat" class="md:col-span-2 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100">
+            
+            <select id="cluster_lomba" class="md:col-span-2 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 font-bold text-blue-600">
+                <option value="">-- Pilih Bidang/Cluster Lomba --</option>
+                <option>Bisnis</option>
+                <option>Desain</option>
+                <option>Kepenulisan</option>
+                <option>Olimpiade</option>
+            </select>
+
+            <textarea id="story" placeholder="Story Telling (Ceritakan pengalamanmu...)" class="md:col-span-2 h-40 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-100 resize-none"></textarea>
+        </div>
+
+        <button onclick="uploadPrestasi()" id="btnUpload" class="w-full mt-8 bg-blue-600 text-white p-5 rounded-2xl font-black shadow-lg shadow-blue-100 transition hover:scale-[1.02] active:scale-95">
+            Upload & Publish ke Home
+        </button>
+    </div>
+
+    <script>
+        // CONFIG SUPABASE
+        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; // MASUKKAN ANON KEY KAMU
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        function updatePlaceholder() {
+            const m = document.getElementById('metode').value;
+            const l = document.getElementById('lokasi');
+            l.placeholder = (m === 'online') ? "Platform (Zoom/Gmeet/Behance)" : "Nama Tempat/Kota";
+        }
+
+        async function uploadPrestasi() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if(!user) return alert("Sesi berakhir, silakan login kembali.");
+
+            const btn = document.getElementById('btnUpload');
+            const data = {
+                title: document.getElementById('title').value,
+                foto_url: document.getElementById('foto').value,
+                tanggal: document.getElementById('tanggal').value,
+                tingkat: document.getElementById('tingkat').value,
+                metode: document.getElementById('metode').value,
+                lokasi: document.getElementById('lokasi').value,
+                cluster: document.getElementById('cluster_lomba').value,
+                story: document.getElementById('story').value,
+                email_user: user.email,
+                nama_user: user.full_name || user.email,
+                created_at: new Date()
+            };
+
+            if(!data.title || !data.cluster) return alert("Harap isi Judul dan Bidang Lomba!");
+
+            btn.innerText = "Sedang Mempublish...";
+            btn.disabled = true;
+
+            const { error } = await _supabase.from('prestasi').insert([data]);
+
+            if(error) {
+                alert("Gagal: " + error.message);
+            } else {
+                alert("Selamat! Prestasi kamu berhasil dipublish.");
+                window.location.reload();
+            }
+            btn.innerText = "Upload & Publish ke Home";
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
