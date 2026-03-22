@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -26,13 +28,20 @@
             🏆 Lapor Prestasi Baru
         </h2>
 
-        <!-- CARD FORM -->
+        <!-- CARD -->
         <div class="bg-white text-gray-800 p-6 md:p-8 rounded-xl shadow-md">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                <input id="foto" placeholder="Link Foto (URL)" 
-                    class="md:col-span-2 p-3 bg-gray-100 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none">
+                <!-- UPLOAD FILE -->
+                <div class="md:col-span-2">
+                    <label class="text-sm font-semibold text-gray-500">Upload Bukti Prestasi</label>
+
+                    <input type="file" id="fotoFile" accept="image/*"
+                        class="w-full mt-2 p-2 bg-gray-100 rounded-lg border border-gray-200">
+
+                    <img id="previewImage" class="mt-3 rounded-lg hidden max-h-40 object-cover">
+                </div>
 
                 <input id="tanggal" type="date" 
                     class="p-3 bg-gray-100 rounded-lg border border-gray-200">
@@ -93,8 +102,18 @@
 
     <script>
         const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const supabaseKey = "YOUR_KEY_HERE";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // PREVIEW IMAGE
+        document.getElementById("fotoFile").addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const preview = document.getElementById("previewImage");
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove("hidden");
+        });
 
         function getPoints(tingkat, juara) {
             const skor = {
@@ -119,33 +138,55 @@
             if (!user) return alert("Login dulu!");
 
             const btn = document.getElementById('btnUpload');
+            const file = document.getElementById('fotoFile').files[0];
+
+            if (!file) return alert("Upload gambar dulu!");
 
             const tingkat = document.getElementById('tingkat').value;
             const juara = document.getElementById('title').value;
             const pointsEarned = getPoints(tingkat, juara);
 
-            const data = {
-                title: juara,
-                foto_url: document.getElementById('foto').value,
-                tanggal: document.getElementById('tanggal').value,
-                tingkat,
-                metode: document.getElementById('metode').value,
-                lokasi: document.getElementById('lokasi').value,
-                cluster: document.getElementById('cluster_lomba').value,
-                story: document.getElementById('story').value,
-                email_user: user.email,
-                nama_user: user.name || user.email,
-                points_given: pointsEarned
-            };
-
-            if (!data.cluster) return alert("Pilih cluster dulu!");
-
-            btn.innerText = `+${pointsEarned} Poin...`;
+            btn.innerText = "Uploading image...";
             btn.disabled = true;
 
             try {
+                const fileName = `${Date.now()}-${file.name}`;
+
+                // UPLOAD KE STORAGE
+                const { error: uploadError } = await _supabase
+                    .storage
+                    .from('prestasi-images')
+                    .upload(fileName, file);
+
+                if (uploadError) throw uploadError;
+
+                // AMBIL URL
+                const { data: publicUrl } = _supabase
+                    .storage
+                    .from('prestasi-images')
+                    .getPublicUrl(fileName);
+
+                const data = {
+                    title: juara,
+                    foto_url: publicUrl.publicUrl,
+                    tanggal: document.getElementById('tanggal').value,
+                    tingkat,
+                    metode: document.getElementById('metode').value,
+                    lokasi: document.getElementById('lokasi').value,
+                    cluster: document.getElementById('cluster_lomba').value,
+                    story: document.getElementById('story').value,
+                    email_user: user.email,
+                    nama_user: user.name || user.email,
+                    points_given: pointsEarned
+                };
+
+                if (!data.cluster) throw new Error("Pilih cluster dulu!");
+
+                btn.innerText = "Saving data...";
+
                 await _supabase.from('prestasi').insert([data]);
 
+                // UPDATE POINT
                 const newTotal = (user.points || 0) + pointsEarned;
 
                 await _supabase
@@ -160,7 +201,8 @@
                 window.location.reload();
 
             } catch (err) {
-                alert(err.message);
+                alert("Error: " + err.message);
+                console.error(err);
             } finally {
                 btn.innerText = "Upload & Publish 🚀";
                 btn.disabled = false;
