@@ -147,6 +147,30 @@
             width: 90%;
         }
     }
+        /* LOGO DEFAULT (PC) */
+        .logo-img {
+            height: 60px;
+            object-fit: contain;
+        }
+        
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .logo-img {
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+    
+        body {
+            overflow-x: hidden;
+        }
+    
+        .navbar {
+            width: 100%;
+        }
+    
+    }
     </style>
 </head>
 
@@ -155,7 +179,7 @@
 <header class="navbar" style="padding: 10px 40px; justify-content: space-between;">
 
     <div class="logo-container" style="display: flex; align-items: center; gap: 15px;">
-       <img src="images/logo.png" style="height: 60px; object-fit: contain;">
+       <img src="images/logo.png" class="logo-img">
     </div>
     <nav>
         <a href="#">Home</a>
