@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Dashboard Anggota Komprestasi</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
@@ -18,6 +20,7 @@
 
         .sidebar {
             width: 260px;
+            transition: 0.3s;
         }
 
         .nav-item {
@@ -29,13 +32,34 @@
             background: rgba(255,255,255,0.15);
             color: #fff;
         }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            main {
+                margin-left: 0 !important;
+            }
+
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 
 <body class="flex min-h-screen text-white">
 
 <!-- SIDEBAR -->
-<aside class="sidebar bg-white/10 backdrop-blur-lg border-r border-white/10 flex flex-col fixed h-full">
+<aside id="sidebar" class="sidebar bg-white/10 backdrop-blur-lg border-r border-white/10 flex flex-col fixed h-full">
 
     <!-- HEADER -->
     <div class="p-6">
@@ -94,8 +118,15 @@
 <!-- CONTENT -->
 <main id="mainContent" class="flex-1 ml-[260px] p-6">
 
+    <!-- HAMBURGER -->
+    <button onclick="toggleSidebar()" 
+        class="md:hidden mb-4 bg-white/20 px-3 py-2 rounded-lg">
+        ☰
+    </button>
+
+    <!-- DEFAULT CONTENT -->
     <h1 class="text-2xl font-bold">Welcome 👋</h1>
-    <p class="text-white/70 mt-2">Selamat datang di dashboard Aksara Karya</p>
+    <p class="text-white/70 mt-2">Selamat datang di dashboard Aksaruy Karuy</p>
 
     <div class="grid grid-cols-3 gap-4 mt-6">
 
@@ -130,7 +161,7 @@ function loadPage(page, el) {
             document.getElementById("mainContent").innerHTML = data;
         })
         .catch(() => {
-            document.getElementById("mainContent").innerHTML = "<p>Halaman tidak ditemukan ❌</p>";
+            document.getElementById("mainContent").innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
         });
 
     document.querySelectorAll(".nav-item").forEach(btn => {
@@ -138,6 +169,13 @@ function loadPage(page, el) {
     });
 
     el.classList.add("active-link");
+
+    // AUTO CLOSE SIDEBAR DI HP
+    document.getElementById("sidebar").classList.remove("show");
+}
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("show");
 }
 
 window.onload = () => {
