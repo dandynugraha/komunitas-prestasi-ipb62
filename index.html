@@ -55,6 +55,98 @@
         .progress { background:#e5e7eb; height:10px; border-radius:10px; margin-top:15px; position: relative; }
         .progress-bar { height:10px; background:#3b82f6; border-radius:10px; transition: width 1s ease-in-out; }
         .loading { text-align: center; padding: 20px; color: #999; font-style: italic; }
+
+        @media (max-width: 768px) {
+
+        /* NAVBAR */
+        .navbar {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px 20px;
+        }
+    
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    
+        nav a {
+            margin: 0;
+            font-size: 14px;
+        }
+    
+        .login {
+            width: 100%;
+            margin-top: 10px;
+        }
+    
+        /* STORY */
+        .story {
+            padding: 20px;
+        }
+    
+        .story-container {
+            gap: 10px;
+        }
+    
+        .story-card {
+            min-width: 220px;
+        }
+    
+        /* ACHIEVEMENT */
+        .achievement {
+            padding: 20px;
+        }
+    
+        .cluster {
+            flex-direction: column;
+        }
+    
+        .cluster-box {
+            width: 100%;
+            text-align: center;
+        }
+    
+        /* LEADERBOARD */
+        .leaderboard {
+            padding: 20px;
+            overflow-x: auto;
+        }
+    
+        table {
+            min-width: 500px;
+        }
+    
+        /* EVENT */
+        .event {
+            padding: 20px;
+        }
+    
+        .event-container {
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .event-card {
+            width: 90%;
+        }
+    
+        /* PROJECT */
+        .project {
+            padding: 20px;
+        }
+    
+        .project-container {
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .project-card {
+            width: 90%;
+        }
+    }
     </style>
 </head>
 
