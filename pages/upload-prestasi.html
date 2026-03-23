@@ -24,52 +24,93 @@
             border-color: #9333ea;
             background: #f5f3ff;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
     </style>
 </head>
 
 <body class="p-6 md:p-10 text-white">
 
-<div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto animate-[fadeIn_.4s_ease]">
 
-    <h2 class="text-2xl md:text-3xl font-extrabold mb-6">
-        🏆 Lapor Prestasi Baru
+    <!-- HEADER -->
+    <h2 class="text-3xl font-extrabold mb-1 flex items-center gap-2">
+        🏆 Lapor Prestasi
     </h2>
+    <p class="text-white/80 mb-6">
+        Bagikan pencapaianmu dan dapatkan poin 🎯
+    </p>
 
-    <div class="bg-white text-gray-800 p-6 md:p-8 rounded-xl shadow-md">
+    <!-- CARD -->
+    <div class="bg-white/95 backdrop-blur-xl text-gray-800 p-6 md:p-8 rounded-2xl shadow-2xl border border-white/20">
 
-        <!-- DRAG & DROP -->
-        <div id="dropzone" class="dropzone p-6 rounded-lg text-center cursor-pointer mb-5">
-            <p class="text-gray-500">📁 Drag & drop gambar di sini atau klik</p>
+        <!-- DROPZONE -->
+        <div id="dropzone" 
+        class="dropzone p-8 rounded-xl text-center cursor-pointer mb-6 
+        border-2 border-dashed border-gray-300 
+        hover:border-purple-500 hover:bg-purple-50 transition">
+
+            <div class="flex flex-col items-center gap-2">
+                <div class="text-3xl">📁</div>
+                <p class="text-gray-600 font-semibold">
+                    Drag & drop gambar
+                </p>
+                <p class="text-xs text-gray-400">
+                    atau klik untuk upload
+                </p>
+            </div>
+
             <input type="file" id="fotoFile" accept="image/*" class="hidden">
-            <img id="previewImage" class="mt-3 rounded-lg hidden max-h-40 mx-auto">
+
+            <img id="previewImage" class="mt-4 rounded-lg hidden max-h-48 shadow-md mx-auto">
         </div>
+
+        <!-- FORM -->
+        <h3 class="text-lg font-bold text-gray-700 mb-4">
+            Informasi Prestasi
+        </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            <input id="tanggal" type="date" class="p-3 bg-gray-100 rounded-lg border">
+            <input id="tanggal" type="date"
+                class="p-3 bg-gray-100 rounded-lg border border-gray-200 
+                focus:ring-2 focus:ring-purple-500 outline-none">
 
-            <select id="title" class="p-3 bg-gray-100 rounded-lg border">
+            <select id="title"
+                class="p-3 bg-gray-100 rounded-lg border border-gray-200 font-semibold 
+                focus:ring-2 focus:ring-purple-500">
                 <option>Juara 1</option>
                 <option>Juara 2</option>
                 <option>Juara 3</option>
                 <option>Finalis</option>
             </select>
 
-            <select id="tingkat" class="p-3 bg-gray-100 rounded-lg border">
+            <select id="tingkat"
+                class="p-3 bg-gray-100 rounded-lg border border-gray-200 font-semibold 
+                focus:ring-2 focus:ring-purple-500">
                 <option>Internasional</option>
                 <option>Nasional</option>
                 <option>Provinsi</option>
                 <option>Universitas</option>
             </select>
 
-            <select id="metode" onchange="updatePlaceholder()" class="p-3 bg-gray-100 rounded-lg border">
+            <select id="metode" onchange="updatePlaceholder()"
+                class="p-3 bg-gray-100 rounded-lg border border-gray-200 
+                focus:ring-2 focus:ring-purple-500">
                 <option value="offline">Offline</option>
                 <option value="online">Online</option>
             </select>
 
-            <input id="lokasi" placeholder="Nama Tempat" class="md:col-span-2 p-3 bg-gray-100 rounded-lg border">
+            <input id="lokasi" placeholder="Nama Tempat"
+                class="md:col-span-2 p-3 bg-gray-100 rounded-lg border border-gray-200 
+                focus:ring-2 focus:ring-purple-500">
 
-            <select id="cluster_lomba" class="md:col-span-2 p-3 bg-gray-100 rounded-lg border">
+            <select id="cluster_lomba"
+                class="md:col-span-2 p-3 bg-gray-100 rounded-lg border border-gray-200 
+                font-semibold text-purple-600 focus:ring-2 focus:ring-purple-500">
                 <option value="">-- Pilih Cluster --</option>
                 <option>Bisnis</option>
                 <option>Desain</option>
@@ -78,13 +119,19 @@
             </select>
 
             <textarea id="story" placeholder="Ceritakan pengalamanmu..."
-                class="md:col-span-2 h-32 p-3 bg-gray-100 rounded-lg border"></textarea>
+                class="md:col-span-2 h-32 p-3 bg-gray-100 rounded-lg border border-gray-200 
+                resize-none focus:ring-2 focus:ring-purple-500"></textarea>
 
         </div>
 
+        <!-- BUTTON -->
         <button onclick="uploadPrestasi()" id="btnUpload"
-            class="w-full mt-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-lg">
-            Upload 🚀
+            class="w-full mt-6 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 
+            text-black font-bold py-4 rounded-xl shadow-lg 
+            hover:scale-[1.02] hover:shadow-xl 
+            active:scale-95 transition duration-200">
+
+            🚀 Upload & Publish
         </button>
 
     </div>
@@ -123,19 +170,21 @@ dropzone.addEventListener("drop", e => {
 
 function handleFile(file) {
     if (!file) return;
-
     selectedFile = file;
-
     preview.src = URL.createObjectURL(file);
     preview.classList.remove("hidden");
 }
 
-// LOGIKA POIN
-function getPoints(tingkat, juara) {
+function getPoints() {
     return 100;
 }
 
-// UPLOAD
+function updatePlaceholder() {
+    const m = document.getElementById('metode').value;
+    document.getElementById('lokasi').placeholder =
+        (m === 'online') ? "Platform (Zoom, dll)" : "Nama Tempat";
+}
+
 async function uploadPrestasi() {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) return alert("Login dulu!");
