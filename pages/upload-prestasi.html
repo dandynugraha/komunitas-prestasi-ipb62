@@ -2,12 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -16,199 +14,166 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
+        .dropzone {
+            border: 2px dashed #d1d5db;
+            transition: 0.3s;
+        }
+
+        .dropzone.dragover {
+            border-color: #9333ea;
+            background: #f5f3ff;
+        }
     </style>
 </head>
 
 <body class="p-6 md:p-10 text-white">
 
-    <div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto">
 
-        <!-- HEADER -->
-        <h2 class="text-2xl md:text-3xl font-extrabold mb-6">
-            🏆 Lapor Prestasi Baru
-        </h2>
+    <h2 class="text-2xl md:text-3xl font-extrabold mb-6">
+        🏆 Lapor Prestasi Baru
+    </h2>
 
-        <!-- CARD -->
-        <div class="bg-white text-gray-800 p-6 md:p-8 rounded-xl shadow-md">
+    <div class="bg-white text-gray-800 p-6 md:p-8 rounded-xl shadow-md">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- DRAG & DROP -->
+        <div id="dropzone" class="dropzone p-6 rounded-lg text-center cursor-pointer mb-5">
+            <p class="text-gray-500">📁 Drag & drop gambar di sini atau klik</p>
+            <input type="file" id="fotoFile" accept="image/*" class="hidden">
+            <img id="previewImage" class="mt-3 rounded-lg hidden max-h-40 mx-auto">
+        </div>
 
-                <!-- UPLOAD FILE -->
-                <div class="md:col-span-2">
-                    <label class="text-sm font-semibold text-gray-500">Upload Bukti Prestasi</label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                    <input type="file" id="fotoFile" accept="image/*"
-                        class="w-full mt-2 p-2 bg-gray-100 rounded-lg border border-gray-200">
+            <input id="tanggal" type="date" class="p-3 bg-gray-100 rounded-lg border">
 
-                    <img id="previewImage" class="mt-3 rounded-lg hidden max-h-40 object-cover">
-                </div>
+            <select id="title" class="p-3 bg-gray-100 rounded-lg border">
+                <option>Juara 1</option>
+                <option>Juara 2</option>
+                <option>Juara 3</option>
+                <option>Finalis</option>
+            </select>
 
-                <input id="tanggal" type="date" 
-                    class="p-3 bg-gray-100 rounded-lg border border-gray-200">
+            <select id="tingkat" class="p-3 bg-gray-100 rounded-lg border">
+                <option>Internasional</option>
+                <option>Nasional</option>
+                <option>Provinsi</option>
+                <option>Universitas</option>
+            </select>
 
-                <select id="title" 
-                    class="p-3 bg-gray-100 rounded-lg border border-gray-200 font-semibold">
-                    <option>Juara 1</option>
-                    <option>Juara 2</option>
-                    <option>Juara 3</option>
-                    <option>Harapan 1</option>
-                    <option>Harapan 2</option>
-                    <option>Harapan 3</option>
-                    <option>Honorable Mention</option>
-                    <option>Finalis / Peserta</option>
-                </select>
+            <select id="metode" onchange="updatePlaceholder()" class="p-3 bg-gray-100 rounded-lg border">
+                <option value="offline">Offline</option>
+                <option value="online">Online</option>
+            </select>
 
-                <select id="tingkat" 
-                    class="p-3 bg-gray-100 rounded-lg border border-gray-200 font-semibold">
-                    <option>Internasional</option>
-                    <option>Nasional</option>
-                    <option>Provinsi</option>
-                    <option>Universitas</option>
-                </select>
+            <input id="lokasi" placeholder="Nama Tempat" class="md:col-span-2 p-3 bg-gray-100 rounded-lg border">
 
-                <select id="metode" onchange="updatePlaceholder()" 
-                    class="p-3 bg-gray-100 rounded-lg border border-gray-200">
-                    <option value="offline">Offline</option>
-                    <option value="online">Online</option>
-                    <option value="hybrid">Hybrid</option>
-                </select>
+            <select id="cluster_lomba" class="md:col-span-2 p-3 bg-gray-100 rounded-lg border">
+                <option value="">-- Pilih Cluster --</option>
+                <option>Bisnis</option>
+                <option>Desain</option>
+                <option>Kepenulisan</option>
+                <option>Olimpiade</option>
+            </select>
 
-                <input id="lokasi" placeholder="Nama Tempat" 
-                    class="md:col-span-2 p-3 bg-gray-100 rounded-lg border border-gray-200">
-
-                <select id="cluster_lomba" 
-                    class="md:col-span-2 p-3 bg-gray-100 rounded-lg border border-gray-200 font-semibold text-purple-600">
-                    <option value="">-- Pilih Cluster --</option>
-                    <option>Bisnis</option>
-                    <option>Desain</option>
-                    <option>Kepenulisan</option>
-                    <option>Olimpiade</option>
-                </select>
-
-                <textarea id="story" placeholder="Ceritakan pengalamanmu..." 
-                    class="md:col-span-2 h-32 p-3 bg-gray-100 rounded-lg border border-gray-200 resize-none"></textarea>
-
-            </div>
-
-            <!-- BUTTON -->
-            <button onclick="uploadPrestasi()" id="btnUpload"
-                class="w-full mt-6 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-3 rounded-lg shadow-md transition active:scale-95">
-                Upload & Publish 🚀
-            </button>
+            <textarea id="story" placeholder="Ceritakan pengalamanmu..."
+                class="md:col-span-2 h-32 p-3 bg-gray-100 rounded-lg border"></textarea>
 
         </div>
 
+        <button onclick="uploadPrestasi()" id="btnUpload"
+            class="w-full mt-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-lg">
+            Upload 🚀
+        </button>
+
     </div>
+</div>
 
-    <script>
-        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; 
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+<script>
+const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // PREVIEW IMAGE
-        document.getElementById("fotoFile").addEventListener("change", function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+let selectedFile = null;
 
-            const preview = document.getElementById("previewImage");
-            preview.src = URL.createObjectURL(file);
-            preview.classList.remove("hidden");
-        });
+// DRAG DROP
+const dropzone = document.getElementById("dropzone");
+const inputFile = document.getElementById("fotoFile");
+const preview = document.getElementById("previewImage");
 
-        function getPoints(tingkat, juara) {
-            const skor = {
-                'Internasional': { 'Juara 1': 500, 'Juara 2': 400, 'Juara 3': 300, 'Lainnya': 150 },
-                'Nasional': { 'Juara 1': 300, 'Juara 2': 200, 'Juara 3': 150, 'Lainnya': 75 },
-                'Provinsi': { 'Juara 1': 150, 'Juara 2': 100, 'Juara 3': 75, 'Lainnya': 40 },
-                'Universitas': { 'Juara 1': 100, 'Juara 2': 75, 'Juara 3': 50, 'Lainnya': 20 }
-            };
+dropzone.addEventListener("click", () => inputFile.click());
 
-            let kategori = juara.includes('Juara') ? juara : 'Lainnya';
-            return skor[tingkat][kategori] || 10;
-        }
+inputFile.addEventListener("change", e => handleFile(e.target.files[0]));
 
-        function updatePlaceholder() {
-            const m = document.getElementById('metode').value;
-            document.getElementById('lokasi').placeholder =
-                (m === 'online') ? "Platform (Zoom, dll)" : "Nama Tempat";
-        }
+dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("dragover");
+});
 
-        async function uploadPrestasi() {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user) return alert("Login dulu!");
+dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("dragover");
+});
 
-            const btn = document.getElementById('btnUpload');
-            const file = document.getElementById('fotoFile').files[0];
+dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    handleFile(e.dataTransfer.files[0]);
+});
 
-            if (!file) return alert("Upload gambar dulu!");
+function handleFile(file) {
+    if (!file) return;
 
-            const tingkat = document.getElementById('tingkat').value;
-            const juara = document.getElementById('title').value;
-            const pointsEarned = getPoints(tingkat, juara);
+    selectedFile = file;
 
-            btn.innerText = "Uploading image...";
-            btn.disabled = true;
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+}
 
-            try {
-                const fileName = `${Date.now()}-${file.name}`;
+// LOGIKA POIN
+function getPoints(tingkat, juara) {
+    return 100;
+}
 
-                // UPLOAD KE STORAGE
-                const { error: uploadError } = await _supabase
-                    .storage
-                    .from('prestasi-images')
-                    .upload(fileName, file);
+// UPLOAD
+async function uploadPrestasi() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return alert("Login dulu!");
 
-                if (uploadError) throw uploadError;
+    if (!selectedFile) return alert("Upload gambar dulu!");
 
-                // AMBIL URL
-                const { data: publicUrl } = _supabase
-                    .storage
-                    .from('prestasi-images')
-                    .getPublicUrl(fileName);
+    const btn = document.getElementById("btnUpload");
+    btn.innerText = "Uploading...";
+    btn.disabled = true;
 
-                const data = {
-                    title: juara,
-                    foto_url: publicUrl.publicUrl,
-                    tanggal: document.getElementById('tanggal').value,
-                    tingkat,
-                    metode: document.getElementById('metode').value,
-                    lokasi: document.getElementById('lokasi').value,
-                    cluster: document.getElementById('cluster_lomba').value,
-                    story: document.getElementById('story').value,
-                    email_user: user.email,
-                    nama_user: user.name || user.email,
-                    points_given: pointsEarned
-                };
+    try {
+        const fileName = Date.now() + "-" + selectedFile.name;
 
-                if (!data.cluster) throw new Error("Pilih cluster dulu!");
+        await _supabase.storage
+            .from("prestasi-images")
+            .upload(fileName, selectedFile);
 
-                btn.innerText = "Saving data...";
+        const { data } = _supabase.storage
+            .from("prestasi-images")
+            .getPublicUrl(fileName);
 
-                await _supabase.from('prestasi').insert([data]);
+        await _supabase.from("prestasi").insert([{
+            title: document.getElementById("title").value,
+            foto_url: data.publicUrl,
+            email_user: user.email
+        }]);
 
-                // UPDATE POINT
-                const newTotal = (user.points || 0) + pointsEarned;
+        alert("Berhasil upload 🔥");
+        location.reload();
 
-                await _supabase
-                    .from('profiles')
-                    .update({ points: newTotal })
-                    .eq('email', user.email);
-
-                user.points = newTotal;
-                localStorage.setItem("user", JSON.stringify(user));
-
-                alert(`🔥 +${pointsEarned} poin berhasil!`);
-                window.location.reload();
-
-            } catch (err) {
-                alert("Error: " + err.message);
-                console.error(err);
-            } finally {
-                btn.innerText = "Upload & Publish 🚀";
-                btn.disabled = false;
-            }
-        }
-    </script>
+    } catch (err) {
+        alert(err.message);
+    } finally {
+        btn.innerText = "Upload 🚀";
+        btn.disabled = false;
+    }
+}
+</script>
 
 </body>
 </html>
