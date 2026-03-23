@@ -140,20 +140,10 @@ function loadPage(page, el) {
     fetch(page)
         .then(res => res.text())
         .then(data => {
-            const container = document.getElementById("mainContent");
-            container.innerHTML = data;
-
-            // 🔥 INI YANG PENTING BANGET
-            const scripts = container.querySelectorAll("script");
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement("script");
-                newScript.textContent = oldScript.textContent;
-                document.body.appendChild(newScript);
-                oldScript.remove();
-            });
+            document.getElementById("mainContent").innerHTML = data;
         })
         .catch(() => {
-            document.getElementById("mainContent").innerHTML = "<p>Halaman tidak ditemukan ❌</p>";
+            document.getElementById("mainContent").innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
         });
 
     document.querySelectorAll(".nav-item").forEach(btn => {
@@ -162,8 +152,6 @@ function loadPage(page, el) {
 
     el.classList.add("active-link");
 
-    document.getElementById("sidebar").classList.remove("show");
-}
     // AUTO CLOSE SIDEBAR DI HP
     document.getElementById("sidebar").classList.remove("show");
 }
