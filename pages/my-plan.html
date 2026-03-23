@@ -12,16 +12,27 @@
 <style>
 body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
+/* DAY */
 .calendar-day {
     transition: 0.2s;
+    color: #1f2937;
 }
 .calendar-day:hover {
     background: #ede9fe;
 }
+
+/* SELECTED */
 .active-day {
-    background: #7c3aed;
+    background: linear-gradient(135deg,#7c3aed,#9333ea);
     color: white;
 }
+
+/* TODAY */
+.today {
+    border: 2px solid #7c3aed;
+}
+
+/* DOT */
 .dot {
     width: 6px;
     height: 6px;
@@ -45,10 +56,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
 <!-- CALENDAR -->
-<div class="lg:col-span-2 bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
+<div class="lg:col-span-2 bg-white/95 p-6 rounded-2xl shadow-2xl">
 
-    <!-- MONTH NAV -->
-    <div class="flex justify-between items-center mb-4">
+    <!-- NAV -->
+    <div class="flex justify-between items-center mb-4 text-gray-800">
         <button onclick="changeMonth(-1)">←</button>
         <h3 id="monthLabel" class="font-bold text-lg"></h3>
         <button onclick="changeMonth(1)">→</button>
@@ -63,7 +74,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
 </div>
 
-<!-- SIDE PANEL -->
+<!-- SIDE -->
 <div class="bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
 
     <h3 class="font-bold mb-4">📌 Agenda</h3>
@@ -80,7 +91,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </button>
 
     <div class="mt-6">
-        <h4 class="font-bold text-sm mb-2">Agenda Hari Ini</h4>
+        <h4 class="font-bold text-sm mb-2">Agenda</h4>
         <div id="list" class="space-y-2 text-sm"></div>
     </div>
 
@@ -98,11 +109,30 @@ const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 let current = new Date();
 let selected = null;
 let plans = {};
+const user = JSON.parse(localStorage.getItem("user"));
 
 function formatDate(d) {
     return d.toISOString().split('T')[0];
 }
 
+// 🔥 LOAD DATA DARI DB
+async function loadPlans() {
+    const { data } = await _supabase
+        .from("user_plans")
+        .select("*")
+        .eq("email", user.email);
+
+    plans = {};
+
+    data?.forEach(p => {
+        if (!plans[p.tanggal]) plans[p.tanggal] = [];
+        plans[p.tanggal].push(p.catatan);
+    });
+
+    renderCalendar();
+}
+
+// 📅 RENDER
 function renderCalendar() {
     const cal = document.getElementById("calendar");
     cal.innerHTML = "";
@@ -125,12 +155,18 @@ function renderCalendar() {
         const key = formatDate(date);
 
         const div = document.createElement("div");
+
         div.className = "calendar-day h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer";
 
+        // TODAY
+        const today = formatDate(new Date());
+        if (key === today) div.classList.add("today");
+
+        // SELECTED
         if (selected === key) div.classList.add("active-day");
 
         div.innerHTML = `
-            <span>${i}</span>
+            <span class="font-semibold">${i}</span>
             ${plans[key] ? '<div class="dot"></div>' : ''}
         `;
 
@@ -140,6 +176,7 @@ function renderCalendar() {
     }
 }
 
+// SELECT DATE
 function selectDate(date) {
     selected = formatDate(date);
     document.getElementById("selectedDate").innerText = selected;
@@ -147,11 +184,13 @@ function selectDate(date) {
     renderList();
 }
 
+// CHANGE MONTH
 function changeMonth(n) {
     current.setMonth(current.getMonth() + n);
     renderCalendar();
 }
 
+// LIST
 function renderList() {
     const box = document.getElementById("list");
     box.innerHTML = "";
@@ -169,16 +208,12 @@ function renderList() {
     });
 }
 
+// SAVE
 async function savePlan() {
-    const user = JSON.parse(localStorage.getItem("user"));
     const note = document.getElementById("note").value;
 
     if (!selected || !note) return alert("Isi dulu!");
 
-    if (!plans[selected]) plans[selected] = [];
-    plans[selected].push(note);
-
-    // SIMPAN KE SUPABASE
     await _supabase.from("user_plans").insert([{
         email: user.email,
         tanggal: selected,
@@ -187,11 +222,12 @@ async function savePlan() {
 
     document.getElementById("note").value = "";
 
-    renderCalendar();
+    await loadPlans(); // reload dari DB
     renderList();
 }
 
-renderCalendar();
+// INIT
+loadPlans();
 </script>
 
 </body>
