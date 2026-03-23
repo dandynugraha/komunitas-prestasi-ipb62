@@ -135,11 +135,37 @@ function loadPage(page, el) {
 
     document.getElementById("mainContent").innerHTML = "<p>Loading...</p>";
 
+function loadPage(page, el) {
+
+    const container = document.getElementById("mainContent");
+    container.innerHTML = "<p>Loading...</p>";
+
     fetch(page)
         .then(res => res.text())
         .then(data => {
-            document.getElementById("mainContent").innerHTML = data;
+            container.innerHTML = data;
+
+            // 🔥 WAJIB: biar script di page jalan
+            const scripts = container.querySelectorAll("script");
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement("script");
+                newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+                oldScript.remove();
+            });
         })
+        .catch(() => {
+            container.innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
+        });
+
+    document.querySelectorAll(".nav-item").forEach(btn => {
+        btn.classList.remove("active-link");
+    });
+
+    if (el) el.classList.add("active-link");
+
+    document.getElementById("sidebar").classList.remove("show");
+}
         .catch(() => {
             document.getElementById("mainContent").innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
         });
@@ -159,7 +185,7 @@ function toggleSidebar() {
 }
 
 window.onload = () => {
-    loadPage('home-dashboard.html', document.querySelector('.nav-item'));
+    loadPage('pages/home-dashboard.html', document.querySelector('.nav-item'));
 };
 
 function logout() {
