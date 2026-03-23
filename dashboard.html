@@ -6,7 +6,10 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ICON -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <!-- FONT -->
@@ -26,10 +29,16 @@
         .nav-item {
             padding: 10px 16px;
             font-size: 13px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
         }
 
         .active-link {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             color: #fff;
         }
 
@@ -73,16 +82,30 @@
     <!-- MENU -->
     <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
 
-        <button onclick="loadPage('pages/home-dashboard.html', this)" class="nav-item active-link">Dashboard</button>
+        <button onclick="loadPage('pages/home-dashboard.html', this)" class="nav-item active-link">
+            <i class="fa-solid fa-house mr-2"></i> Dashboard
+        </button>
         
-        <button onclick="loadPage('pages/upload-prestasi.html', this)" class="nav-item">Upload Prestasi</button>
+        <button onclick="loadPage('pages/upload-prestasi.html', this)" class="nav-item">
+            <i class="fa-solid fa-trophy mr-2"></i> Upload Prestasi
+        </button>
         
-        <button onclick="loadPage('pages/upload-proyek.html', this)" class="nav-item">Upload Proyek</button>
+        <button onclick="loadPage('pages/upload-proyek.html', this)" class="nav-item">
+            <i class="fa-solid fa-diagram-project mr-2"></i> Upload Proyek
+        </button>
         
-        <button onclick="loadPage('pages/lomba-saya.html', this)" class="nav-item">Lomba Saya</button>
+        <button onclick="loadPage('pages/lomba-saya.html', this)" class="nav-item">
+            <i class="fa-solid fa-flag mr-2"></i> Lomba Saya
+        </button>
         
-        <button onclick="loadPage('pages/event-saya.html', this)" class="nav-item">Event Saya</button>
-        
+        <button onclick="loadPage('pages/event-saya.html', this)" class="nav-item">
+            <i class="fa-solid fa-calendar mr-2"></i> Event Saya
+        </button>
+
+        <button onclick="loadPage('pages/my-plan.html', this)" class="nav-item">
+            <i class="fa-solid fa-calendar-days mr-2"></i> My Plan
+        </button>
+
     </nav>
 
     <!-- LOGOUT -->
@@ -104,27 +127,9 @@
         ☰
     </button>
 
-    <!-- DEFAULT CONTENT -->
-    <h1 class="text-2xl font-bold">Welcome 👋</h1>
-    <p class="text-white/70 mt-2">Selamat datang di dashboard Aksaruy Karuy</p>
-
-    <div class="grid grid-cols-3 gap-4 mt-6">
-
-        <div class="bg-white/10 backdrop-blur-lg p-5 rounded-xl shadow-lg">
-            <h3 class="text-sm text-white/70">Total Prestasi</h3>
-            <p class="text-3xl font-bold mt-2">10</p>
-        </div>
-
-        <div class="bg-white/10 backdrop-blur-lg p-5 rounded-xl shadow-lg">
-            <h3 class="text-sm text-white/70">Event Diikuti</h3>
-            <p class="text-3xl font-bold mt-2">5</p>
-        </div>
-
-        <div class="bg-white/10 backdrop-blur-lg p-5 rounded-xl shadow-lg">
-            <h3 class="text-sm text-white/70">Project Aktif</h3>
-            <p class="text-3xl font-bold mt-2">2</p>
-        </div>
-
+    <!-- DEFAULT LOADING -->
+    <div class="animate-pulse">
+        <h1 class="text-2xl font-bold">Loading Dashboard...</h1>
     </div>
 
 </main>
@@ -133,50 +138,35 @@
 <script>
 function loadPage(page, el) {
 
-    document.getElementById("mainContent").innerHTML = "<p>Loading...</p>";
-
-function loadPage(page, el) {
-
     const container = document.getElementById("mainContent");
-    container.innerHTML = "<p>Loading...</p>";
+    container.innerHTML = "<p class='text-white/70'>Loading...</p>";
 
     fetch(page)
         .then(res => res.text())
         .then(data => {
             container.innerHTML = data;
 
-            // 🔥 WAJIB: biar script di page jalan
+            // 🔥 JALANKAN SCRIPT DI DALAM PAGE (AMAN)
             const scripts = container.querySelectorAll("script");
-            scripts.forEach(oldScript => {
+            scripts.forEach(script => {
                 const newScript = document.createElement("script");
-                newScript.textContent = oldScript.textContent;
-                document.body.appendChild(newScript);
-                oldScript.remove();
+                newScript.textContent = script.textContent;
+                container.appendChild(newScript);
+                script.remove();
             });
         })
         .catch(() => {
             container.innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
         });
 
+    // ACTIVE MENU
     document.querySelectorAll(".nav-item").forEach(btn => {
         btn.classList.remove("active-link");
     });
 
     if (el) el.classList.add("active-link");
 
-    document.getElementById("sidebar").classList.remove("show");
-}
-        .catch(() => {
-            document.getElementById("mainContent").innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
-        });
-
-    document.querySelectorAll(".nav-item").forEach(btn => {
-        btn.classList.remove("active-link");
-    });
-
-    el.classList.add("active-link");
-
-    // AUTO CLOSE SIDEBAR DI HP
+    // CLOSE SIDEBAR HP
     document.getElementById("sidebar").classList.remove("show");
 }
 
