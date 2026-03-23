@@ -5,7 +5,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <!-- FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -14,10 +13,17 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
     </style>
 </head>
 
 <body class="p-6 md:p-10 text-white">
+
+<div class="animate-[fadeIn_.4s_ease]">
 
     <!-- HEADER -->
     <header class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
@@ -27,31 +33,54 @@
                 Halo, <span id="userName">User</span> 👋
             </h2>
             <p class="text-white/80 mt-1">
-                Selamat datang kembali di Portal Aksara Karya 62.
+                Selamat datang kembali di Portal Aksara Karya 62 🚀
             </p>
         </div>
 
         <!-- POINT CARD -->
-        <div class="bg-white text-gray-800 px-5 py-4 rounded-xl shadow-md flex items-center gap-4 w-fit">
-            <div class="bg-yellow-400 text-black p-3 rounded-lg text-lg">
+        <div class="bg-white/95 text-gray-800 px-6 py-5 rounded-2xl shadow-2xl flex items-center gap-4">
+            <div class="bg-yellow-400 text-black p-3 rounded-xl text-lg shadow">
                 ⭐
             </div>
             <div>
                 <p class="text-xs font-semibold text-gray-500 uppercase">Total Poin</p>
-                <p id="userPoints" class="text-xl font-extrabold text-yellow-500">0 PTS</p>
+                <p id="userPoints" class="text-2xl font-extrabold text-yellow-500">0 PTS</p>
             </div>
         </div>
 
     </header>
 
+    <!-- STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+        <div class="bg-white/95 text-gray-800 p-5 rounded-2xl shadow-xl">
+            <p class="text-sm text-gray-500">Total Prestasi</p>
+            <p id="totalPrestasi" class="text-2xl font-bold">0</p>
+        </div>
+
+        <div class="bg-white/95 text-gray-800 p-5 rounded-2xl shadow-xl">
+            <p class="text-sm text-gray-500">Total Plan</p>
+            <p id="totalPlan" class="text-2xl font-bold">0</p>
+        </div>
+
+        <div class="bg-white/95 text-gray-800 p-5 rounded-2xl shadow-xl">
+            <p class="text-sm text-gray-500">Aktivitas</p>
+            <p class="text-2xl font-bold text-purple-600">Aktif</p>
+        </div>
+
+    </div>
+
     <!-- CONTENT -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <!-- PRESTASI -->
-        <div class="bg-white text-gray-800 p-6 rounded-xl shadow-md">
-            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                ⏱️ Riwayat Prestasi
-            </h3>
+        <div class="bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    🏆 Riwayat Prestasi
+                </h3>
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -60,10 +89,12 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
 
         <!-- PLAN -->
-        <div class="bg-white text-gray-800 p-6 rounded-xl shadow-md">
+        <div class="bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
+
             <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                 📅 Rencana Mendatang
             </h3>
@@ -71,91 +102,99 @@
             <div id="myPlanList" class="space-y-3">
                 <p class="text-gray-400 italic">Memuat rencana...</p>
             </div>
+
         </div>
 
     </div>
 
-    <script>
-        const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</div>
 
-        const user = JSON.parse(localStorage.getItem("user"));
+<script>
+const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function loadDashboardData() {
-            if (!user) return;
+const user = JSON.parse(localStorage.getItem("user"));
 
-            document.getElementById('userName').innerText =
-                user.full_name || user.name || "User";
+async function loadDashboardData() {
 
-            // POINT
-            const { data: profile } = await _supabase
-                .from('profiles')
-                .select('points')
-                .eq('email', user.email)
-                .single();
+    if (!user) return;
 
-            if (profile)
-                document.getElementById('userPoints').innerText =
-                    `${profile.points || 0} PTS`;
+    document.getElementById('userName').innerText =
+        user.full_name || user.name || "User";
 
-            // PRESTASI
-            const { data: prestasis } = await _supabase
-                .from('prestasi')
-                .select('*')
-                .eq('email_user', user.email)
-                .order('created_at', { ascending: false });
+    // POINT
+    const { data: profile } = await _supabase
+        .from('profiles')
+        .select('points')
+        .eq('email', user.email)
+        .single();
 
-            const prestList = document.getElementById('myAchievementList');
+    if (profile)
+        document.getElementById('userPoints').innerText =
+            `${profile.points || 0} PTS`;
 
-            if (prestasis && prestasis.length > 0) {
-                prestList.innerHTML = prestasis.map(p => `
-                    <tr class="border-b last:border-0">
-                        <td class="py-3">
-                            <p class="font-semibold text-gray-800">${p.title}</p>
-                            <p class="text-xs text-gray-400">${p.tingkat} • ${p.cluster}</p>
-                        </td>
-                        <td class="py-3 text-right font-bold text-yellow-500">
-                            +${p.points_given || 0}
-                        </td>
-                    </tr>
-                `).join('');
-            } else {
-                prestList.innerHTML = "<tr><td class='py-4 text-gray-400'>Belum ada prestasi.</td></tr>";
-            }
+    // PRESTASI
+    const { data: prestasis } = await _supabase
+        .from('prestasi')
+        .select('*')
+        .eq('email_user', user.email);
 
-            // PLAN
-            const { data: plans } = await _supabase
-                .from('user_plans')
-                .select('*')
-                .eq('email', user.email)
-                .order('tanggal', { ascending: true });
+    document.getElementById('totalPrestasi').innerText =
+        prestasis ? prestasis.length : 0;
 
-            const planBox = document.getElementById('myPlanList');
+    const prestList = document.getElementById('myAchievementList');
 
-            if (plans && plans.length > 0) {
-                planBox.innerHTML = plans.map(pl => `
-                    <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <div class="bg-yellow-400 text-black px-3 py-2 rounded-lg mr-3 text-center">
-                            <p class="text-[10px] font-bold uppercase">
-                                ${new Date(pl.tanggal).toLocaleString('id-ID', {month: 'short'})}
-                            </p>
-                            <p class="text-sm font-bold">
-                                ${new Date(pl.tanggal).getDate()}
-                            </p>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-700">
-                            ${pl.catatan}
-                        </p>
-                    </div>
-                `).join('');
-            } else {
-                planBox.innerHTML = "<p class='text-gray-400 text-sm'>Belum ada rencana.</p>";
-            }
-        }
+    if (prestasis && prestasis.length > 0) {
+        prestList.innerHTML = prestasis.map(p => `
+            <tr class="border-b last:border-0">
+                <td class="py-3">
+                    <p class="font-semibold">${p.title}</p>
+                    <p class="text-xs text-gray-400">${p.tingkat} • ${p.cluster}</p>
+                </td>
+                <td class="py-3 text-right font-bold text-yellow-500">
+                    +${p.points_given || 0}
+                </td>
+            </tr>
+        `).join('');
+    } else {
+        prestList.innerHTML = "<tr><td class='py-4 text-gray-400'>Belum ada prestasi.</td></tr>";
+    }
 
-        loadDashboardData();
-    </script>
+    // PLAN
+    const { data: plans } = await _supabase
+        .from('user_plans')
+        .select('*')
+        .eq('email', user.email);
+
+    document.getElementById('totalPlan').innerText =
+        plans ? plans.length : 0;
+
+    const planBox = document.getElementById('myPlanList');
+
+    if (plans && plans.length > 0) {
+        planBox.innerHTML = plans.map(pl => `
+            <div class="flex items-center p-3 bg-gray-50 rounded-xl border">
+                <div class="bg-purple-600 text-white px-3 py-2 rounded-lg mr-3 text-center">
+                    <p class="text-[10px] uppercase">
+                        ${new Date(pl.tanggal).toLocaleString('id-ID', {month: 'short'})}
+                    </p>
+                    <p class="text-sm font-bold">
+                        ${new Date(pl.tanggal).getDate()}
+                    </p>
+                </div>
+                <p class="text-sm font-semibold">
+                    ${pl.catatan}
+                </p>
+            </div>
+        `).join('');
+    } else {
+        planBox.innerHTML = "<p class='text-gray-400 text-sm'>Belum ada rencana.</p>";
+    }
+}
+
+loadDashboardData();
+</script>
 
 </body>
 </html>
