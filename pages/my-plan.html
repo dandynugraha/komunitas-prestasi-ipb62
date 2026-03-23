@@ -16,6 +16,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 .calendar-day {
     transition: 0.2s;
     color: #1f2937;
+    pointer-events: auto;
 }
 .calendar-day:hover {
     background: #ede9fe;
@@ -70,7 +71,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
         <div>MIN</div><div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
     </div>
 
-    <div id="calendar" class="grid grid-cols-7 gap-2"></div>
+    <!-- GRID -->
+    <div id="calendar" class="grid grid-cols-7 gap-2 relative z-20"></div>
 
 </div>
 
@@ -103,7 +105,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
 <script>
 const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I"; 
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 let current = new Date();
@@ -111,12 +113,16 @@ let selected = null;
 let plans = {};
 const user = JSON.parse(localStorage.getItem("user"));
 
+// FORMAT
 function formatDate(d) {
     return d.toISOString().split('T')[0];
 }
 
-// 🔥 LOAD DATA DARI DB
+// LOAD DATA
 async function loadPlans() {
+
+    if (!user) return;
+
     const { data } = await _supabase
         .from("user_plans")
         .select("*")
@@ -132,8 +138,9 @@ async function loadPlans() {
     renderCalendar();
 }
 
-// 📅 RENDER
+// RENDER CALENDAR
 function renderCalendar() {
+
     const cal = document.getElementById("calendar");
     cal.innerHTML = "";
 
@@ -146,31 +153,41 @@ function renderCalendar() {
     const firstDay = new Date(year, month, 1).getDay();
     const totalDays = new Date(year, month + 1, 0).getDate();
 
+    // EMPTY SLOT (FIX BUG CLICK)
     for (let i = 0; i < firstDay; i++) {
-        cal.innerHTML += "<div></div>";
+        const empty = document.createElement("div");
+        empty.className = "h-16";
+        cal.appendChild(empty);
     }
 
+    // DAYS
     for (let i = 1; i <= totalDays; i++) {
+
         const date = new Date(year, month, i);
         const key = formatDate(date);
 
         const div = document.createElement("div");
 
-        div.className = "calendar-day h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer";
+        div.className = "calendar-day h-16 w-full rounded-xl flex flex-col items-center justify-center cursor-pointer";
 
         // TODAY
-        const today = formatDate(new Date());
-        if (key === today) div.classList.add("today");
+        if (key === formatDate(new Date())) {
+            div.classList.add("today");
+        }
 
         // SELECTED
-        if (selected === key) div.classList.add("active-day");
+        if (selected === key) {
+            div.classList.add("active-day");
+        }
 
         div.innerHTML = `
             <span class="font-semibold">${i}</span>
             ${plans[key] ? '<div class="dot"></div>' : ''}
         `;
 
-        div.onclick = () => selectDate(date);
+        div.onclick = () => {
+            selectDate(date);
+        };
 
         cal.appendChild(div);
     }
@@ -190,8 +207,9 @@ function changeMonth(n) {
     renderCalendar();
 }
 
-// LIST
+// RENDER LIST
 function renderList() {
+
     const box = document.getElementById("list");
     box.innerHTML = "";
 
@@ -208,8 +226,9 @@ function renderList() {
     });
 }
 
-// SAVE
+// SAVE PLAN
 async function savePlan() {
+
     const note = document.getElementById("note").value;
 
     if (!selected || !note) return alert("Isi dulu!");
@@ -222,12 +241,14 @@ async function savePlan() {
 
     document.getElementById("note").value = "";
 
-    await loadPlans(); // reload dari DB
+    await loadPlans();
     renderList();
 }
 
-// INIT
-loadPlans();
+// INIT (PENTING UNTUK LOADPAGE)
+setTimeout(() => {
+    loadPlans();
+}, 100);
 </script>
 
 </body>
