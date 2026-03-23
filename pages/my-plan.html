@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+.calendar-day {
+    transition: 0.2s;
+}
+.calendar-day:hover {
+    background: #ede9fe;
+}
+.active-day {
+    background: #7c3aed;
+    color: white;
+}
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #7c3aed;
+    border-radius: 999px;
+    margin-top: 4px;
+}
+</style>
+</head>
+
+<body class="p-6 md:p-10 text-white">
+
+<div class="max-w-6xl mx-auto">
+
+<!-- HEADER -->
+<div class="mb-6">
+    <h2 class="text-3xl font-extrabold">📅 My Plan</h2>
+    <p class="text-white/80 text-sm">Kelola rencana harianmu seperti Google Calendar 🚀</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+<!-- CALENDAR -->
+<div class="lg:col-span-2 bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
+
+    <!-- MONTH NAV -->
+    <div class="flex justify-between items-center mb-4">
+        <button onclick="changeMonth(-1)">←</button>
+        <h3 id="monthLabel" class="font-bold text-lg"></h3>
+        <button onclick="changeMonth(1)">→</button>
+    </div>
+
+    <!-- DAYS -->
+    <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-400 mb-2">
+        <div>MIN</div><div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div>
+    </div>
+
+    <div id="calendar" class="grid grid-cols-7 gap-2"></div>
+
+</div>
+
+<!-- SIDE PANEL -->
+<div class="bg-white/95 text-gray-800 p-6 rounded-2xl shadow-2xl">
+
+    <h3 class="font-bold mb-4">📌 Agenda</h3>
+
+    <p id="selectedDate" class="text-sm text-gray-500 mb-4">Pilih tanggal</p>
+
+    <textarea id="note"
+        placeholder="Tulis rencana kamu..."
+        class="w-full p-3 bg-gray-100 rounded-xl outline-none"></textarea>
+
+    <button onclick="savePlan()"
+        class="w-full mt-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl font-bold">
+        Simpan
+    </button>
+
+    <div class="mt-6">
+        <h4 class="font-bold text-sm mb-2">Agenda Hari Ini</h4>
+        <div id="list" class="space-y-2 text-sm"></div>
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+let current = new Date();
+let selected = null;
+let plans = {};
+
+function formatDate(d) {
+    return d.toISOString().split('T')[0];
+}
+
+function renderCalendar() {
+    const cal = document.getElementById("calendar");
+    cal.innerHTML = "";
+
+    const year = current.getFullYear();
+    const month = current.getMonth();
+
+    document.getElementById("monthLabel").innerText =
+        current.toLocaleString("id-ID", { month: "long", year: "numeric" });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        cal.innerHTML += "<div></div>";
+    }
+
+    for (let i = 1; i <= totalDays; i++) {
+        const date = new Date(year, month, i);
+        const key = formatDate(date);
+
+        const div = document.createElement("div");
+        div.className = "calendar-day h-16 rounded-xl flex flex-col items-center justify-center cursor-pointer";
+
+        if (selected === key) div.classList.add("active-day");
+
+        div.innerHTML = `
+            <span>${i}</span>
+            ${plans[key] ? '<div class="dot"></div>' : ''}
+        `;
+
+        div.onclick = () => selectDate(date);
+
+        cal.appendChild(div);
+    }
+}
+
+function selectDate(date) {
+    selected = formatDate(date);
+    document.getElementById("selectedDate").innerText = selected;
+    renderCalendar();
+    renderList();
+}
+
+function changeMonth(n) {
+    current.setMonth(current.getMonth() + n);
+    renderCalendar();
+}
+
+function renderList() {
+    const box = document.getElementById("list");
+    box.innerHTML = "";
+
+    if (!plans[selected]) {
+        box.innerHTML = "<p class='text-gray-400'>Belum ada agenda</p>";
+        return;
+    }
+
+    plans[selected].forEach(p => {
+        const div = document.createElement("div");
+        div.className = "bg-purple-100 p-2 rounded-lg";
+        div.innerText = p;
+        box.appendChild(div);
+    });
+}
+
+async function savePlan() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const note = document.getElementById("note").value;
+
+    if (!selected || !note) return alert("Isi dulu!");
+
+    if (!plans[selected]) plans[selected] = [];
+    plans[selected].push(note);
+
+    // SIMPAN KE SUPABASE
+    await _supabase.from("user_plans").insert([{
+        email: user.email,
+        tanggal: selected,
+        catatan: note
+    }]);
+
+    document.getElementById("note").value = "";
+
+    renderCalendar();
+    renderList();
+}
+
+renderCalendar();
+</script>
+
+</body>
+</html>
