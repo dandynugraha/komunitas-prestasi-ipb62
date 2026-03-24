@@ -92,10 +92,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 </div>
 
 <script>
+<script>
 const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
 
-// ✅ FIX SUPABASE
+// INIT
 const { createClient } = supabase;
 const _supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -111,14 +112,23 @@ function showTab(tab, el){
     el.classList.add("active");
 }
 
-// LOAD CLUSTER
+// ================= LOAD CLUSTER =================
 async function loadCluster(){
 
     const currentUser = JSON.parse(localStorage.getItem("user"));
 
+    console.log("USER LOGIN:", currentUser);
+
+    if(!currentUser){
+        document.getElementById("clusterList").innerHTML = `
+            <div class="card">⚠️ User belum login</div>
+        `;
+        return;
+    }
+
     const { data, error } = await _supabase.from("profiles").select("*");
 
-    console.log("DATA SUPABASE:", data);
+    console.log("DATA DB:", data);
 
     if(error){
         alert(error.message);
@@ -132,8 +142,20 @@ async function loadCluster(){
         return;
     }
 
-    // 🔥 HAPUS FILTER (BIAR SEMUA MUNCUL)
-    const members = data;
+    // 🔥 FILTER SESUAI CLUSTER USER
+    const members = data.filter(u => 
+        (u.cluster || "").toLowerCase() === (currentUser.cluster || "").toLowerCase()
+    );
+
+    // ❌ kalau kosong
+    if(members.length === 0){
+        document.getElementById("clusterList").innerHTML = `
+            <div class="card">
+                ❌ Tidak ada anggota di cluster <b>${currentUser.cluster}</b>
+            </div>
+        `;
+        return;
+    }
 
     const map = {};
 
@@ -151,21 +173,30 @@ async function loadCluster(){
 
     document.getElementById("clusterList").innerHTML =
         Object.keys(map).map(c=>`
-            <div class="card mb-4">
-                <h3 class="font-bold mb-2">${c}</h3>
+            <div class="card mb-5">
+                <h3 class="font-bold mb-4 text-lg">${c}</h3>
 
-                ${map[c].map(u=>`
-                    <div onclick="detail('${u.email}')"
-                        class="flex justify-between p-2 hover:bg-gray-100 cursor-pointer rounded">
-                        <span>${u.name}</span>
-                        <span class="text-purple-600 font-bold">${u.points}</span>
-                    </div>
-                `).join("")}
+                <div class="grid gap-2">
+                    ${map[c].map(u=>`
+                        <div onclick="detail('${u.email}')"
+                            class="flex justify-between items-center p-3 bg-gray-50 hover:bg-yellow-100 transition rounded-xl cursor-pointer">
+                            
+                            <div>
+                                <p class="font-semibold">${u.name}</p>
+                                <p class="text-xs text-gray-500">${u.email}</p>
+                            </div>
+
+                            <div class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                ${u.points} pts
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
             </div>
         `).join("");
 }
 
-// DETAIL
+// ================= DETAIL =================
 async function detail(email){
 
     document.getElementById("clusterTab").classList.add("hidden");
@@ -178,8 +209,14 @@ async function detail(email){
 
     document.getElementById("detail").innerHTML = `
         <div class="card">
-            <h3 class="font-bold mb-2">Prestasi</h3>
-            ${prestasi?.map(p=>`<p>- ${p.title}</p>`).join("") || "Kosong"}
+            <h3 class="font-bold mb-3">Prestasi</h3>
+
+            ${prestasi?.map(p=>`
+                <div class="p-3 border rounded-lg mb-2 bg-gray-50">
+                    <p class="font-bold">${p.title}</p>
+                    <p class="text-xs text-gray-500">${p.cluster}</p>
+                </div>
+            `).join("") || "Kosong"}
         </div>
     `;
 }
@@ -203,7 +240,7 @@ async function submitEvent(){
 
         const { error } = await _supabase.from("events").insert([{
             title: document.getElementById("event_title").value,
-            image: document.getElementById("event_image").value,
+            image_url: document.getElementById("event_image").value, // ✅ FIX
             caption: document.getElementById("event_caption").value,
             visibility: document.getElementById("event_visibility").value,
             gform: document.getElementById("event_gform").value,
@@ -221,7 +258,7 @@ async function submitEvent(){
     }
 }
 
-// ✅ FIX LOAD
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
     loadCluster();
 });
