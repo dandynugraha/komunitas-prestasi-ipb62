@@ -11,69 +11,97 @@
 
 <style>
 body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
 .card {
     background: rgba(255,255,255,0.95);
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 20px;
     color: #111;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.tab-btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    font-weight: bold;
+}
+.tab-btn.active {
+    background: #facc15;
+    color: black;
 }
 </style>
 </head>
 
 <body class="p-6 md:p-10 text-white">
 
-<h2 class="text-3xl font-extrabold mb-6">📊 CDA Control Panel</h2>
+<h2 class="text-3xl font-extrabold mb-6">🎯 CDA Control Panel</h2>
 
 <!-- NAV -->
-<div class="flex gap-3 mb-6">
-    <button onclick="showTab('cluster')" class="bg-white/20 px-4 py-2 rounded-lg">Cluster</button>
-    <button onclick="showTab('design')" class="bg-white/20 px-4 py-2 rounded-lg">Request Design</button>
+<div class="flex gap-3 mb-6 flex-wrap">
+    <button onclick="showTab('cluster', this)" class="tab-btn active">Cluster</button>
+    <button onclick="showTab('design', this)" class="tab-btn">Request Design</button>
+    <button onclick="showTab('event', this)" class="tab-btn">Upload Event</button>
 </div>
 
 <!-- ================= CLUSTER ================= -->
 <div id="clusterTab">
-
     <div id="clusterList" class="space-y-6"></div>
-
 </div>
 
-<!-- ================= DETAIL MEMBER ================= -->
+<!-- ================= DETAIL ================= -->
 <div id="detailTab" class="hidden">
-
-    <button onclick="backToCluster()" class="mb-4 bg-white/20 px-4 py-2 rounded-lg">
-        ← Kembali
-    </button>
-
+    <button onclick="backToCluster()" class="mb-4 bg-white/20 px-4 py-2 rounded-lg">← Kembali</button>
     <div id="memberDetail"></div>
-
 </div>
 
 <!-- ================= DESIGN ================= -->
 <div id="designTab" class="hidden">
+    <div class="card space-y-4">
+        <h3 class="text-xl font-bold">🎨 Request Design ke MBD</h3>
+
+        <input id="judul" placeholder="Judul Konten" class="w-full p-3 rounded-lg border">
+        <input id="ilustrasi" placeholder="Ilustrasi" class="w-full p-3 rounded-lg border">
+        <input id="drive" placeholder="Link Drive" class="w-full p-3 rounded-lg border">
+
+        <textarea id="caption" placeholder="Caption" class="w-full p-3 rounded-lg border"></textarea>
+        <textarea id="reels" placeholder="Konsep Reels" class="w-full p-3 rounded-lg border"></textarea>
+
+        <button onclick="submitDesign()"
+            class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-xl">
+            Kirim Request 🚀
+        </button>
+    </div>
+</div>
+
+<!-- ================= EVENT ================= -->
+<div id="eventTab" class="hidden">
 
     <div class="card space-y-4">
 
-        <h3 class="text-xl font-bold">🎨 Request Design ke MBD</h3>
+        <h3 class="text-xl font-bold">📢 Upload Event / Mentoring</h3>
 
-        <input id="judul" placeholder="Judul Konten"
+        <input id="event_title" placeholder="Judul Event"
             class="w-full p-3 rounded-lg border">
 
-        <input id="ilustrasi" placeholder="Ilustrasi yang diinginkan"
+        <input id="event_image" placeholder="Link Poster (URL)"
             class="w-full p-3 rounded-lg border">
 
-        <input id="drive" placeholder="Link Drive (Asset)"
-            class="w-full p-3 rounded-lg border">
-
-        <textarea id="caption" placeholder="Caption"
+        <textarea id="event_caption" placeholder="Deskripsi Event"
             class="w-full p-3 rounded-lg border"></textarea>
 
-        <textarea id="reels" placeholder="Konsep Reels"
-            class="w-full p-3 rounded-lg border"></textarea>
+        <select id="event_visibility"
+            class="w-full p-3 rounded-lg border font-bold">
+            <option value="public">🌍 Public (Tampil di Home)</option>
+            <option value="cluster">🔒 Khusus Cluster</option>
+        </select>
 
-        <button onclick="submitDesign()"
-            class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-lg">
-            Kirim Request 🚀
+        <input id="event_gform" placeholder="Link Google Form (optional)"
+            class="w-full p-3 rounded-lg border">
+
+        <button onclick="submitEvent()"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold py-3 rounded-xl">
+            Publish Event 🚀
         </button>
 
     </div>
@@ -86,25 +114,35 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // ================= NAV =================
-function showTab(tab) {
-    document.getElementById("clusterTab").classList.add("hidden");
-    document.getElementById("designTab").classList.add("hidden");
-    document.getElementById("detailTab").classList.add("hidden");
+function showTab(tab, el) {
+    ["clusterTab","designTab","eventTab","detailTab"].forEach(id=>{
+        document.getElementById(id).classList.add("hidden");
+    });
 
-    if(tab === "cluster") document.getElementById("clusterTab").classList.remove("hidden");
-    if(tab === "design") document.getElementById("designTab").classList.remove("hidden");
+    if(tab==="cluster") document.getElementById("clusterTab").classList.remove("hidden");
+    if(tab==="design") document.getElementById("designTab").classList.remove("hidden");
+    if(tab==="event") document.getElementById("eventTab").classList.remove("hidden");
+
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    if(el) el.classList.add("active");
 }
 
-// ================= LOAD CLUSTER =================
+// ================= CLUSTER =================
 async function loadCluster() {
 
-    const { data: users } = await _supabase.from('profiles').select('*');
+    const { data: users, error } = await _supabase.from('profiles').select('*');
+
+    if(error){
+        alert(error.message);
+        return;
+    }
 
     const map = {};
 
     users.forEach(u => {
-        if(!map[u.cluster]) map[u.cluster] = [];
-        map[u.cluster].push(u);
+        const cluster = u.cluster || "Tanpa Cluster";
+        if(!map[cluster]) map[cluster] = [];
+        map[cluster].push(u);
     });
 
     const container = document.getElementById("clusterList");
@@ -115,12 +153,10 @@ async function loadCluster() {
             <h3 class="font-bold text-lg mb-3">${cluster}</h3>
 
             ${map[cluster].map(u => `
-                <div onclick="openDetail('${u.email}')" 
+                <div onclick="openDetail('${u.email}')"
                     class="flex justify-between p-2 hover:bg-gray-100 rounded cursor-pointer">
-                    
                     <span>${u.name || u.email}</span>
                     <span class="font-bold text-purple-600">${u.points || 0} pts</span>
-
                 </div>
             `).join("")}
 
@@ -128,20 +164,15 @@ async function loadCluster() {
     `).join("");
 }
 
-// ================= DETAIL MEMBER =================
+// ================= DETAIL =================
 async function openDetail(email) {
 
     document.getElementById("clusterTab").classList.add("hidden");
     document.getElementById("detailTab").classList.remove("hidden");
 
-    const { data: prestasi } = await _supabase
-        .from('prestasi').select('*').eq('email_user', email);
-
-    const { data: proyek } = await _supabase
-        .from('proyek').select('*').eq('email_user', email);
-
-    const { data: lomba } = await _supabase
-        .from('lomba_tracking').select('*').eq('email', email);
+    const { data: prestasi } = await _supabase.from('prestasi').select('*').eq('email_user', email);
+    const { data: proyek } = await _supabase.from('proyek').select('*').eq('email_user', email);
+    const { data: lomba } = await _supabase.from('lomba_tracking').select('*').eq('email', email);
 
     document.getElementById("memberDetail").innerHTML = `
         <div class="card mb-4">
@@ -161,13 +192,13 @@ async function openDetail(email) {
     `;
 }
 
-function backToCluster() {
+function backToCluster(){
     document.getElementById("detailTab").classList.add("hidden");
     document.getElementById("clusterTab").classList.remove("hidden");
 }
 
 // ================= DESIGN =================
-async function submitDesign() {
+async function submitDesign(){
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -181,10 +212,29 @@ async function submitDesign() {
         status: "pending"
     }]);
 
-    alert("🔥 Request berhasil dikirim ke MBD!");
+    alert("🔥 Request terkirim!");
 }
 
-// INIT
+// ================= EVENT =================
+async function submitEvent(){
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const visibility = document.getElementById("event_visibility").value;
+
+    await _supabase.from('events').insert([{
+        title: document.getElementById("event_title").value,
+        image: document.getElementById("event_image").value,
+        caption: document.getElementById("event_caption").value,
+        visibility: visibility,
+        gform: document.getElementById("event_gform").value,
+        cluster_target: visibility === "cluster" ? user.cluster : null,
+        created_by: user.email
+    }]);
+
+    alert("🚀 Event berhasil dipublish!");
+}
+
 loadCluster();
 </script>
 
