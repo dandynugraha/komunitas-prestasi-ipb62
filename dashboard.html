@@ -21,10 +21,7 @@
             background: linear-gradient(135deg, #1e1b4b, #6d28d9, #9333ea);
         }
 
-        .sidebar {
-            width: 260px;
-            transition: 0.3s;
-        }
+        .sidebar { width: 260px; transition: 0.3s; }
 
         .nav-item {
             padding: 10px 16px;
@@ -33,34 +30,22 @@
             transition: 0.2s;
         }
 
-        .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
 
         .active-link {
             background: rgba(255,255,255,0.2);
             color: #fff;
         }
 
-        /* MOBILE */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
                 position: fixed;
                 z-index: 50;
             }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            main {
-                margin-left: 0 !important;
-            }
-
-            .grid {
-                grid-template-columns: 1fr !important;
-            }
+            .sidebar.show { transform: translateX(0); }
+            main { margin-left: 0 !important; }
+            .grid { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -79,34 +64,8 @@
         </h1>
     </div>
 
-    <!-- MENU -->
-    <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-
-        <button onclick="loadPage('pages/home-dashboard.html', this)" class="nav-item active-link">
-            <i class="fa-solid fa-house mr-2"></i> Dashboard
-        </button>
-        
-        <button onclick="loadPage('pages/upload-prestasi.html', this)" class="nav-item">
-            <i class="fa-solid fa-trophy mr-2"></i> Upload Prestasi
-        </button>
-        
-        <button onclick="loadPage('pages/upload-proyek.html', this)" class="nav-item">
-            <i class="fa-solid fa-diagram-project mr-2"></i> Upload Proyek
-        </button>
-        
-        <button onclick="loadPage('pages/lomba-saya.html', this)" class="nav-item">
-            <i class="fa-solid fa-flag mr-2"></i> Lomba Saya
-        </button>
-        
-        <button onclick="loadPage('pages/event-saya.html', this)" class="nav-item">
-            <i class="fa-solid fa-calendar mr-2"></i> Event Saya
-        </button>
-
-        <button onclick="loadPage('pages/my-plan.html', this)" class="nav-item">
-            <i class="fa-solid fa-calendar-days mr-2"></i> My Plan
-        </button>
-
-    </nav>
+    <!-- MENU DINAMIS -->
+    <nav id="menuContainer" class="flex-1 px-3 space-y-1 overflow-y-auto"></nav>
 
     <!-- LOGOUT -->
     <div class="p-4 border-t border-white/10">
@@ -127,7 +86,7 @@
         ☰
     </button>
 
-    <!-- DEFAULT LOADING -->
+    <!-- DEFAULT -->
     <div class="animate-pulse">
         <h1 class="text-2xl font-bold">Loading Dashboard...</h1>
     </div>
@@ -136,6 +95,88 @@
 
 <!-- SCRIPT -->
 <script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+/* ================= MENU BUILDER ================= */
+function buildMenu() {
+    const menu = document.getElementById("menuContainer");
+
+    let html = `
+        <button onclick="loadPage('pages/home-dashboard.html', this)" class="nav-item active-link">
+            <i class="fa-solid fa-house mr-2"></i> Dashboard
+        </button>
+
+        <button onclick="loadPage('pages/upload-prestasi.html', this)" class="nav-item">
+            <i class="fa-solid fa-trophy mr-2"></i> Upload Prestasi
+        </button>
+
+        <button onclick="loadPage('pages/upload-proyek.html', this)" class="nav-item">
+            <i class="fa-solid fa-diagram-project mr-2"></i> Upload Proyek
+        </button>
+
+        <button onclick="loadPage('pages/lomba-saya.html', this)" class="nav-item">
+            <i class="fa-solid fa-flag mr-2"></i> Lomba Saya
+        </button>
+
+        <button onclick="loadPage('pages/event-saya.html', this)" class="nav-item">
+            <i class="fa-solid fa-calendar mr-2"></i> Event Saya
+        </button>
+
+        <button onclick="loadPage('pages/my-plan.html', this)" class="nav-item">
+            <i class="fa-solid fa-calendar-days mr-2"></i> My Plan
+        </button>
+    `;
+
+    // 🔥 ROLE BASED MENU
+    if (user && user.role) {
+        const role = user.role.toLowerCase();
+
+        if (role.includes("cda")) {
+            html += `
+                <div class="mt-4 text-xs text-white/50 px-2">STAFF</div>
+                <button onclick="loadPage('staff/cda.html', this)" class="nav-item text-yellow-300 font-bold">
+                    🎯 CDA Panel
+                </button>
+            `;
+        }
+
+        if (role.includes("mbd")) {
+            html += `
+                <button onclick="loadPage('staff/mbd.html', this)" class="nav-item text-yellow-300 font-bold">
+                    🎨 MBD Panel
+                </button>
+            `;
+        }
+
+        if (role.includes("heg")) {
+            html += `
+                <button onclick="loadPage('staff/heg.html', this)" class="nav-item text-yellow-300 font-bold">
+                    ⚙️ HEG Panel
+                </button>
+            `;
+        }
+
+        if (role.includes("bph")) {
+            html += `
+                <button onclick="loadPage('staff/bph.html', this)" class="nav-item text-yellow-300 font-bold">
+                    👑 BPH Panel
+                </button>
+            `;
+        }
+
+        if (role.includes("korvoks")) {
+            html += `
+                <button onclick="loadPage('staff/korvoks.html', this)" class="nav-item text-yellow-300 font-bold">
+                    👑 Korvoks Panel
+                </button>
+            `;
+        }
+    }
+
+    menu.innerHTML = html;
+}
+
+/* ================= LOAD PAGE ================= */
 function loadPage(page, el) {
 
     const container = document.getElementById("mainContent");
@@ -146,7 +187,6 @@ function loadPage(page, el) {
         .then(data => {
             container.innerHTML = data;
 
-            // 🔥 JALANKAN SCRIPT DI DALAM PAGE (AMAN)
             const scripts = container.querySelectorAll("script");
             scripts.forEach(script => {
                 const newScript = document.createElement("script");
@@ -159,25 +199,31 @@ function loadPage(page, el) {
             container.innerHTML = "<p>Yahh Halamannya Gaada euyy ❌</p>";
         });
 
-    // ACTIVE MENU
     document.querySelectorAll(".nav-item").forEach(btn => {
         btn.classList.remove("active-link");
     });
 
     if (el) el.classList.add("active-link");
 
-    // CLOSE SIDEBAR HP
     document.getElementById("sidebar").classList.remove("show");
 }
 
+/* ================= MOBILE ================= */
 function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle("show");
 }
 
+/* ================= INIT ================= */
 window.onload = () => {
-    loadPage('pages/home-dashboard.html', document.querySelector('.nav-item'));
+    buildMenu();
+
+    setTimeout(() => {
+        const firstBtn = document.querySelector(".nav-item");
+        loadPage('pages/home-dashboard.html', firstBtn);
+    }, 100);
 };
 
+/* ================= LOGOUT ================= */
 function logout() {
     if (confirm("Yakin mau logout?")) {
         localStorage.clear();
