@@ -33,7 +33,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 </style>
 </head>
 
-<body class="p-6 md:p-10 text-white">
+<body class="p-6 md:p-10 text-white bg-gradient-to-br from-purple-700 to-indigo-900">
 
 <h2 class="text-3xl font-extrabold mb-6">🎯 CDA Control Panel</h2>
 
@@ -94,7 +94,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 <script>
 const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
-const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// ✅ FIX SUPABASE
+const { createClient } = supabase;
+const _supabase = createClient(supabaseUrl, supabaseKey);
 
 // NAV
 function showTab(tab, el){
@@ -111,7 +114,7 @@ function showTab(tab, el){
 // LOAD CLUSTER
 async function loadCluster(){
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     const { data, error } = await _supabase.from("profiles").select("*");
 
@@ -120,7 +123,6 @@ async function loadCluster(){
         return;
     }
 
-    // 🔥 FILTER MEMBER (bukan staff)
     const members = data.filter(u => !(u.role || "").includes("staff"));
 
     const map = {};
@@ -153,7 +155,10 @@ async function detail(email){
     document.getElementById("clusterTab").classList.add("hidden");
     document.getElementById("detailTab").classList.remove("hidden");
 
-    const { data: prestasi } = await _supabase.from("prestasi").select("*").eq("email_user", email);
+    const { data: prestasi } = await _supabase
+        .from("prestasi")
+        .select("*")
+        .eq("email_user", email);
 
     document.getElementById("detail").innerHTML = `
         <div class="card">
@@ -173,23 +178,21 @@ async function submitDesign(){
     alert("Design sent (dummy dulu)");
 }
 
-// EVENT FIXED
+// EVENT
 async function submitEvent(){
 
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    const title = document.getElementById("event_title").value;
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     try{
 
         const { error } = await _supabase.from("events").insert([{
-            title,
+            title: document.getElementById("event_title").value,
             image: document.getElementById("event_image").value,
             caption: document.getElementById("event_caption").value,
             visibility: document.getElementById("event_visibility").value,
             gform: document.getElementById("event_gform").value,
-            cluster_target: user.cluster,
-            created_by: user.email
+            cluster_target: currentUser?.cluster,
+            created_by: currentUser?.email
         }]);
 
         if(error) throw error;
@@ -202,7 +205,10 @@ async function submitEvent(){
     }
 }
 
-loadCluster();
+// ✅ FIX LOAD
+document.addEventListener("DOMContentLoaded", () => {
+    loadCluster();
+});
 </script>
 
 </body>
