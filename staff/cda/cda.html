@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Plus Jakarta Sans', sans-serif; }
+.card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 20px;
+    color: #111;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+
+<body class="p-6 md:p-10 text-white">
+
+<h2 class="text-3xl font-extrabold mb-6">📊 CDA Control Panel</h2>
+
+<!-- NAV -->
+<div class="flex gap-3 mb-6">
+    <button onclick="showTab('cluster')" class="bg-white/20 px-4 py-2 rounded-lg">Cluster</button>
+    <button onclick="showTab('design')" class="bg-white/20 px-4 py-2 rounded-lg">Request Design</button>
+</div>
+
+<!-- ================= CLUSTER ================= -->
+<div id="clusterTab">
+
+    <div id="clusterList" class="space-y-6"></div>
+
+</div>
+
+<!-- ================= DETAIL MEMBER ================= -->
+<div id="detailTab" class="hidden">
+
+    <button onclick="backToCluster()" class="mb-4 bg-white/20 px-4 py-2 rounded-lg">
+        ← Kembali
+    </button>
+
+    <div id="memberDetail"></div>
+
+</div>
+
+<!-- ================= DESIGN ================= -->
+<div id="designTab" class="hidden">
+
+    <div class="card space-y-4">
+
+        <h3 class="text-xl font-bold">🎨 Request Design ke MBD</h3>
+
+        <input id="judul" placeholder="Judul Konten"
+            class="w-full p-3 rounded-lg border">
+
+        <input id="ilustrasi" placeholder="Ilustrasi yang diinginkan"
+            class="w-full p-3 rounded-lg border">
+
+        <input id="drive" placeholder="Link Drive (Asset)"
+            class="w-full p-3 rounded-lg border">
+
+        <textarea id="caption" placeholder="Caption"
+            class="w-full p-3 rounded-lg border"></textarea>
+
+        <textarea id="reels" placeholder="Konsep Reels"
+            class="w-full p-3 rounded-lg border"></textarea>
+
+        <button onclick="submitDesign()"
+            class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-lg">
+            Kirim Request 🚀
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
+const supabaseKey = "ISI_KEY_KAMU";
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// ================= NAV =================
+function showTab(tab) {
+    document.getElementById("clusterTab").classList.add("hidden");
+    document.getElementById("designTab").classList.add("hidden");
+    document.getElementById("detailTab").classList.add("hidden");
+
+    if(tab === "cluster") document.getElementById("clusterTab").classList.remove("hidden");
+    if(tab === "design") document.getElementById("designTab").classList.remove("hidden");
+}
+
+// ================= LOAD CLUSTER =================
+async function loadCluster() {
+
+    const { data: users } = await _supabase.from('profiles').select('*');
+
+    const map = {};
+
+    users.forEach(u => {
+        if(!map[u.cluster]) map[u.cluster] = [];
+        map[u.cluster].push(u);
+    });
+
+    const container = document.getElementById("clusterList");
+
+    container.innerHTML = Object.keys(map).map(cluster => `
+        <div class="card">
+
+            <h3 class="font-bold text-lg mb-3">${cluster}</h3>
+
+            ${map[cluster].map(u => `
+                <div onclick="openDetail('${u.email}')" 
+                    class="flex justify-between p-2 hover:bg-gray-100 rounded cursor-pointer">
+                    
+                    <span>${u.name || u.email}</span>
+                    <span class="font-bold text-purple-600">${u.points || 0} pts</span>
+
+                </div>
+            `).join("")}
+
+        </div>
+    `).join("");
+}
+
+// ================= DETAIL MEMBER =================
+async function openDetail(email) {
+
+    document.getElementById("clusterTab").classList.add("hidden");
+    document.getElementById("detailTab").classList.remove("hidden");
+
+    const { data: prestasi } = await _supabase
+        .from('prestasi').select('*').eq('email_user', email);
+
+    const { data: proyek } = await _supabase
+        .from('proyek').select('*').eq('email_user', email);
+
+    const { data: lomba } = await _supabase
+        .from('lomba_tracking').select('*').eq('email', email);
+
+    document.getElementById("memberDetail").innerHTML = `
+        <div class="card mb-4">
+            <h3 class="font-bold mb-2">🏆 Prestasi</h3>
+            ${prestasi?.map(p => `<p>- ${p.title}</p>`).join("") || "Belum ada"}
+        </div>
+
+        <div class="card mb-4">
+            <h3 class="font-bold mb-2">🚀 Proyek</h3>
+            ${proyek?.map(p => `<p>- ${p.nama}</p>`).join("") || "Belum ada"}
+        </div>
+
+        <div class="card">
+            <h3 class="font-bold mb-2">🏁 Lomba</h3>
+            ${lomba?.map(l => `<p>- ${l.nama_lomba} (${l.status})</p>`).join("") || "Belum ada"}
+        </div>
+    `;
+}
+
+function backToCluster() {
+    document.getElementById("detailTab").classList.add("hidden");
+    document.getElementById("clusterTab").classList.remove("hidden");
+}
+
+// ================= DESIGN =================
+async function submitDesign() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    await _supabase.from('design_requests').insert([{
+        judul: document.getElementById("judul").value,
+        ilustrasi: document.getElementById("ilustrasi").value,
+        drive: document.getElementById("drive").value,
+        caption: document.getElementById("caption").value,
+        reels: document.getElementById("reels").value,
+        dibuat_oleh: user.email,
+        status: "pending"
+    }]);
+
+    alert("🔥 Request berhasil dikirim ke MBD!");
+}
+
+// INIT
+loadCluster();
+</script>
+
+</body>
+</html>
