@@ -118,19 +118,35 @@ async function loadCluster(){
 
     const { data, error } = await _supabase.from("profiles").select("*");
 
+    console.log("DATA SUPABASE:", data);
+
     if(error){
         alert(error.message);
         return;
     }
 
-    const members = data.filter(u => !(u.role || "").includes("staff"));
+    if(!data || data.length === 0){
+        document.getElementById("clusterList").innerHTML = `
+            <div class="card">⚠️ Data kosong / tidak terbaca</div>
+        `;
+        return;
+    }
+
+    // 🔥 HAPUS FILTER (BIAR SEMUA MUNCUL)
+    const members = data;
 
     const map = {};
 
     members.forEach(u=>{
         const c = u.cluster || "Tanpa Cluster";
+
         if(!map[c]) map[c] = [];
-        map[c].push(u);
+
+        map[c].push({
+            name: u.name || "Tanpa Nama",
+            email: u.email || "-",
+            points: u.points || 0
+        });
     });
 
     document.getElementById("clusterList").innerHTML =
@@ -141,8 +157,8 @@ async function loadCluster(){
                 ${map[c].map(u=>`
                     <div onclick="detail('${u.email}')"
                         class="flex justify-between p-2 hover:bg-gray-100 cursor-pointer rounded">
-                        <span>${u.name || u.email}</span>
-                        <span class="text-purple-600 font-bold">${u.points || 0}</span>
+                        <span>${u.name}</span>
+                        <span class="text-purple-600 font-bold">${u.points}</span>
                     </div>
                 `).join("")}
             </div>
