@@ -37,75 +37,58 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
 <h2 class="text-3xl font-extrabold mb-6">🎯 CDA Control Panel</h2>
 
-<!-- NAV -->
-<div class="flex gap-3 mb-6 flex-wrap">
+<div class="flex gap-3 mb-6">
     <button onclick="showTab('cluster', this)" class="tab-btn active">Cluster</button>
-    <button onclick="showTab('design', this)" class="tab-btn">Request Design</button>
-    <button onclick="showTab('event', this)" class="tab-btn">Upload Event</button>
+    <button onclick="showTab('design', this)" class="tab-btn">Design</button>
+    <button onclick="showTab('event', this)" class="tab-btn">Event</button>
 </div>
 
-<!-- ================= CLUSTER ================= -->
+<!-- CLUSTER -->
 <div id="clusterTab">
-    <div id="clusterList" class="space-y-6"></div>
+    <div id="clusterList"></div>
 </div>
 
-<!-- ================= DETAIL ================= -->
+<!-- DETAIL -->
 <div id="detailTab" class="hidden">
-    <button onclick="backToCluster()" class="mb-4 bg-white/20 px-4 py-2 rounded-lg">← Kembali</button>
-    <div id="memberDetail"></div>
+    <button onclick="back()" class="mb-4 bg-white/20 px-4 py-2 rounded">← Back</button>
+    <div id="detail"></div>
 </div>
 
-<!-- ================= DESIGN ================= -->
+<!-- DESIGN -->
 <div id="designTab" class="hidden">
-    <div class="card space-y-4">
-        <h3 class="text-xl font-bold">🎨 Request Design ke MBD</h3>
-
-        <input id="judul" placeholder="Judul Konten" class="w-full p-3 rounded-lg border">
-        <input id="ilustrasi" placeholder="Ilustrasi" class="w-full p-3 rounded-lg border">
-        <input id="drive" placeholder="Link Drive" class="w-full p-3 rounded-lg border">
-
-        <textarea id="caption" placeholder="Caption" class="w-full p-3 rounded-lg border"></textarea>
-        <textarea id="reels" placeholder="Konsep Reels" class="w-full p-3 rounded-lg border"></textarea>
+    <div class="card space-y-3">
+        <input id="judul" placeholder="Judul" class="w-full p-3 border rounded">
+        <input id="ilustrasi" placeholder="Ilustrasi" class="w-full p-3 border rounded">
+        <textarea id="caption" placeholder="Caption" class="w-full p-3 border rounded"></textarea>
 
         <button onclick="submitDesign()"
-            class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-3 rounded-xl">
-            Kirim Request 🚀
+            class="w-full bg-yellow-400 p-3 font-bold rounded">
+            Kirim 🚀
         </button>
     </div>
 </div>
 
-<!-- ================= EVENT ================= -->
+<!-- EVENT -->
 <div id="eventTab" class="hidden">
+    <div class="card space-y-3">
 
-    <div class="card space-y-4">
+        <input id="event_title" placeholder="Judul Event" class="w-full p-3 border rounded">
+        <input id="event_image" placeholder="Link Poster" class="w-full p-3 border rounded">
+        <textarea id="event_caption" placeholder="Deskripsi" class="w-full p-3 border rounded"></textarea>
 
-        <h3 class="text-xl font-bold">📢 Upload Event / Mentoring</h3>
-
-        <input id="event_title" placeholder="Judul Event"
-            class="w-full p-3 rounded-lg border">
-
-        <input id="event_image" placeholder="Link Poster (URL)"
-            class="w-full p-3 rounded-lg border">
-
-        <textarea id="event_caption" placeholder="Deskripsi Event"
-            class="w-full p-3 rounded-lg border"></textarea>
-
-        <select id="event_visibility"
-            class="w-full p-3 rounded-lg border font-bold">
-            <option value="public">🌍 Public (Tampil di Home)</option>
-            <option value="cluster">🔒 Khusus Cluster</option>
+        <select id="event_visibility" class="w-full p-3 border rounded">
+            <option value="public">Public</option>
+            <option value="cluster">Cluster Only</option>
         </select>
 
-        <input id="event_gform" placeholder="Link Google Form (optional)"
-            class="w-full p-3 rounded-lg border">
+        <input id="event_gform" placeholder="Link GForm" class="w-full p-3 border rounded">
 
         <button onclick="submitEvent()"
-            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold py-3 rounded-xl">
-            Publish Event 🚀
+            class="w-full bg-purple-600 text-white p-3 rounded font-bold">
+            Publish 🚀
         </button>
 
     </div>
-
 </div>
 
 <script>
@@ -113,126 +96,110 @@ const supabaseUrl = "https://uaygxlfwrsbjfsjmfpum.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWd4bGZ3cnNiamZzam1mcHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzE4MDQsImV4cCI6MjA4OTUwNzgwNH0.f91OrgTEAj0kSfwXKKiKNRfz_487zN9mWKYNeDJu84I";
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ================= NAV =================
-function showTab(tab, el) {
+// NAV
+function showTab(tab, el){
     ["clusterTab","designTab","eventTab","detailTab"].forEach(id=>{
         document.getElementById(id).classList.add("hidden");
     });
 
-    if(tab==="cluster") document.getElementById("clusterTab").classList.remove("hidden");
-    if(tab==="design") document.getElementById("designTab").classList.remove("hidden");
-    if(tab==="event") document.getElementById("eventTab").classList.remove("hidden");
+    document.getElementById(tab+"Tab").classList.remove("hidden");
 
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    if(el) el.classList.add("active");
+    el.classList.add("active");
 }
 
-// ================= CLUSTER =================
-async function loadCluster() {
+// LOAD CLUSTER
+async function loadCluster(){
 
-    const { data: users, error } = await _supabase.from('profiles').select('*');
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const { data, error } = await _supabase.from("profiles").select("*");
 
     if(error){
         alert(error.message);
         return;
     }
 
+    // 🔥 FILTER MEMBER (bukan staff)
+    const members = data.filter(u => !(u.role || "").includes("staff"));
+
     const map = {};
 
-    users.forEach(u => {
-        const cluster = u.cluster || "Tanpa Cluster";
-        if(!map[cluster]) map[cluster] = [];
-        map[cluster].push(u);
+    members.forEach(u=>{
+        const c = u.cluster || "Tanpa Cluster";
+        if(!map[c]) map[c] = [];
+        map[c].push(u);
     });
 
-    const container = document.getElementById("clusterList");
+    document.getElementById("clusterList").innerHTML =
+        Object.keys(map).map(c=>`
+            <div class="card mb-4">
+                <h3 class="font-bold mb-2">${c}</h3>
 
-    container.innerHTML = Object.keys(map).map(cluster => `
-        <div class="card">
-
-            <h3 class="font-bold text-lg mb-3">${cluster}</h3>
-
-            ${map[cluster].map(u => `
-                <div onclick="openDetail('${u.email}')"
-                    class="flex justify-between p-2 hover:bg-gray-100 rounded cursor-pointer">
-                    <span>${u.name || u.email}</span>
-                    <span class="font-bold text-purple-600">${u.points || 0} pts</span>
-                </div>
-            `).join("")}
-
-        </div>
-    `).join("");
+                ${map[c].map(u=>`
+                    <div onclick="detail('${u.email}')"
+                        class="flex justify-between p-2 hover:bg-gray-100 cursor-pointer rounded">
+                        <span>${u.name || u.email}</span>
+                        <span class="text-purple-600 font-bold">${u.points || 0}</span>
+                    </div>
+                `).join("")}
+            </div>
+        `).join("");
 }
 
-// ================= DETAIL =================
-async function openDetail(email) {
+// DETAIL
+async function detail(email){
 
     document.getElementById("clusterTab").classList.add("hidden");
     document.getElementById("detailTab").classList.remove("hidden");
 
-    const { data: prestasi } = await _supabase.from('prestasi').select('*').eq('email_user', email);
-    const { data: proyek } = await _supabase.from('proyek').select('*').eq('email_user', email);
-    const { data: lomba } = await _supabase.from('lomba_tracking').select('*').eq('email', email);
+    const { data: prestasi } = await _supabase.from("prestasi").select("*").eq("email_user", email);
 
-    document.getElementById("memberDetail").innerHTML = `
-        <div class="card mb-4">
-            <h3 class="font-bold mb-2">🏆 Prestasi</h3>
-            ${prestasi?.map(p => `<p>- ${p.title}</p>`).join("") || "Belum ada"}
-        </div>
-
-        <div class="card mb-4">
-            <h3 class="font-bold mb-2">🚀 Proyek</h3>
-            ${proyek?.map(p => `<p>- ${p.nama}</p>`).join("") || "Belum ada"}
-        </div>
-
+    document.getElementById("detail").innerHTML = `
         <div class="card">
-            <h3 class="font-bold mb-2">🏁 Lomba</h3>
-            ${lomba?.map(l => `<p>- ${l.nama_lomba} (${l.status})</p>`).join("") || "Belum ada"}
+            <h3 class="font-bold mb-2">Prestasi</h3>
+            ${prestasi?.map(p=>`<p>- ${p.title}</p>`).join("") || "Kosong"}
         </div>
     `;
 }
 
-function backToCluster(){
+function back(){
     document.getElementById("detailTab").classList.add("hidden");
     document.getElementById("clusterTab").classList.remove("hidden");
 }
 
-// ================= DESIGN =================
+// DESIGN
 async function submitDesign(){
-
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    await _supabase.from('design_requests').insert([{
-        judul: document.getElementById("judul").value,
-        ilustrasi: document.getElementById("ilustrasi").value,
-        drive: document.getElementById("drive").value,
-        caption: document.getElementById("caption").value,
-        reels: document.getElementById("reels").value,
-        dibuat_oleh: user.email,
-        status: "pending"
-    }]);
-
-    alert("🔥 Request terkirim!");
+    alert("Design sent (dummy dulu)");
 }
 
-// ================= EVENT =================
+// EVENT FIXED
 async function submitEvent(){
 
     const user = JSON.parse(localStorage.getItem("user"));
 
-    const visibility = document.getElementById("event_visibility").value;
+    const title = document.getElementById("event_title").value;
 
-    await _supabase.from('events').insert([{
-        title: document.getElementById("event_title").value,
-        image: document.getElementById("event_image").value,
-        caption: document.getElementById("event_caption").value,
-        visibility: visibility,
-        gform: document.getElementById("event_gform").value,
-        cluster_target: visibility === "cluster" ? user.cluster : null,
-        created_by: user.email
-    }]);
+    try{
 
-    alert("🚀 Event berhasil dipublish!");
+        const { error } = await _supabase.from("events").insert([{
+            title,
+            image: document.getElementById("event_image").value,
+            caption: document.getElementById("event_caption").value,
+            visibility: document.getElementById("event_visibility").value,
+            gform: document.getElementById("event_gform").value,
+            cluster_target: user.cluster,
+            created_by: user.email
+        }]);
+
+        if(error) throw error;
+
+        alert("🔥 Event berhasil!");
+
+    }catch(err){
+        console.error(err);
+        alert("ERROR: " + err.message);
+    }
 }
 
 loadCluster();
