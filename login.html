@@ -17,6 +17,7 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
         background: linear-gradient(135deg, #1e1b4b, #6d28d9, #9333ea);
     }
+        const { data, error } = await _supabase
     </style>
 </head>
 
@@ -92,23 +93,28 @@
 
                 if (error) throw error;
 
-                if (data && data.length > 0) {
-                    const userAccount = data[0];
-                    localStorage.setItem("user", JSON.stringify(userAccount));
-
-                    const role = (userAccount.role || "").toLowerCase();
-
-                    if(role.includes("cda")) window.location.href = "dashboard-cda.html";
-                    else if(role.includes("mbd")) window.location.href = "dashboard-mbd.html";
-                    else if(role.includes("heg")) window.location.href = "dashboard-heg.html";
-                    else if(role.includes("bph")) window.location.href = "dashboard-bph.html";
-                    else if(role.includes("korvoks")) window.location.href = "dashboard-korvoks.html";
-                    else window.location.href = "dashboard.html";
-
-                } else {
-                    errorMsg.innerText = "Akun tidak ditemukan atau password salah.";
+            if (data && data.length > 0) {
+                let userAccount = data[0];
+            
+                // 🔥 default role kalau kosong
+                if (!userAccount.role) {
+                    userAccount.role = "member";
                 }
+            
+                // simpan user
+                localStorage.setItem("user", JSON.stringify(userAccount));
+            
+                // redirect
+                window.location.href = "dashboard.html";
+            
+            } else {
+                errorMsg.innerText = "Akun tidak ditemukan atau password salah.";
+            }
 
+            if (!userAccount.role) {
+                userAccount.role = "member";
+            }
+                
             } catch (err) {
                 errorMsg.innerText = "Error: " + err.message;
             } finally {
