@@ -1,0 +1,323 @@
+<div class="animate-fadeInUp">
+    <div style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gray-900);">🎨 MBD Panel</h2>
+        <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;" id="mbd-subtitle">Media & Branding Design — Order masuk dari divisi lain</p>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+        <button onclick="mbdTab('orders',this)" class="btn btn-primary btn-sm mbd-tab active">📥 Design Orders</button>
+        <button onclick="mbdTab('event',this)" class="btn btn-ghost btn-sm mbd-tab">📅 Upload Event</button>
+        <button onclick="mbdTab('webdev',this)" class="btn btn-ghost btn-sm mbd-tab">💻 Web Dev Control</button>
+    </div>
+
+    <!-- DESIGN ORDERS -->
+    <div id="mbd-tab-orders" class="mbd-panel">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button onclick="mbdFilterOrders('all',this)" class="btn btn-ghost btn-sm mbd-filter active">Semua</button>
+            <button onclick="mbdFilterOrders('Ilustrasi',this)" class="btn btn-ghost btn-sm mbd-filter">Ilustrasi</button>
+            <button onclick="mbdFilterOrders('Desain Grafis',this)" class="btn btn-ghost btn-sm mbd-filter">Desain Grafis</button>
+            <button onclick="mbdFilterOrders('Video',this)" class="btn btn-ghost btn-sm mbd-filter">Video</button>
+            <button onclick="mbdFilterOrders('Multimedia',this)" class="btn btn-ghost btn-sm mbd-filter">Multimedia</button>
+        </div>
+        <div id="mbd-orders-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+            <p style="grid-column:1/-1;text-align:center;color:var(--ak-gray-400);padding:32px;">Memuat order...</p>
+        </div>
+    </div>
+
+    <!-- UPLOAD EVENT -->
+    <div id="mbd-tab-event" class="mbd-panel" style="display:none;">
+        <div class="card" style="padding:28px;max-width:600px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Upload Event MBD</h3>
+            <div class="form-group">
+                <label class="form-label">Judul Event</label>
+                <input id="mbd-ev-title" class="form-input" placeholder="Nama event">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea id="mbd-ev-desc" class="form-textarea" placeholder="Penjelasan..."></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group">
+                    <label class="form-label">Link Poster</label>
+                    <input id="mbd-ev-image" class="form-input" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Visibilitas</label>
+                    <select id="mbd-ev-vis" class="form-select">
+                        <option value="all">Anggota Saja</option>
+                        <option value="public">Public</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="mbdUploadEvent()" id="mbd-ev-btn" class="btn btn-primary btn-block">Upload Event</button>
+        </div>
+    </div>
+
+    <!-- WEB DEV CONTROL PANEL (Kadiv MBD) -->
+    <div id="mbd-tab-webdev" class="mbd-panel" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+
+            <!-- MANAGE EVENTS -->
+            <div class="card" style="padding:24px;">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">📅 Kelola Events</h3>
+                <div id="wd-events" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+                    <p style="color:var(--ak-gray-400);font-size:13px;">Memuat...</p>
+                </div>
+            </div>
+
+            <!-- MANAGE INFO LOMBA -->
+            <div class="card" style="padding:24px;">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">📢 Kelola Info Lomba</h3>
+                <div class="form-group">
+                    <label class="form-label">Judul Lomba</label>
+                    <input id="wd-lomba-title" class="form-input" placeholder="Nama lomba">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Caption / Deskripsi</label>
+                    <textarea id="wd-lomba-desc" class="form-textarea" placeholder="Info lomba..." style="min-height:60px;"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="form-group">
+                        <label class="form-label">Link Daftar</label>
+                        <input id="wd-lomba-link" class="form-input" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Link Guidebook</label>
+                        <input id="wd-lomba-guide" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link Poster</label>
+                    <input id="wd-lomba-poster" class="form-input" placeholder="https://...">
+                </div>
+                <button onclick="wdPublishLomba()" id="wd-lomba-btn" class="btn btn-gold btn-block">Publish Info Lomba</button>
+            </div>
+
+            <!-- MANAGE FASILITAS -->
+            <div class="card" style="padding:24px;">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">🎁 Kelola Fasilitas</h3>
+                <div class="form-group">
+                    <label class="form-label">Judul Fasilitas</label>
+                    <input id="wd-fas-title" class="form-input" placeholder="Nama fasilitas">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea id="wd-fas-desc" class="form-textarea" placeholder="Keterangan..." style="min-height:60px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link Terkait</label>
+                    <input id="wd-fas-link" class="form-input" placeholder="https://...">
+                </div>
+                <button onclick="wdPublishFasilitas()" id="wd-fas-btn" class="btn btn-primary btn-block">Publish Fasilitas</button>
+            </div>
+
+            <!-- SITE STATS -->
+            <div class="card" style="padding:24px;">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">📊 Statistik Website</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="background:var(--ak-gray-50);padding:16px;border-radius:var(--radius-md);text-align:center;">
+                        <div style="font-size:11px;color:var(--ak-gray-400);font-weight:600;">USERS</div>
+                        <div id="wd-stat-users" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-purple);">0</div>
+                    </div>
+                    <div style="background:var(--ak-gray-50);padding:16px;border-radius:var(--radius-md);text-align:center;">
+                        <div style="font-size:11px;color:var(--ak-gray-400);font-weight:600;">PRESTASI</div>
+                        <div id="wd-stat-prestasi" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-gold);">0</div>
+                    </div>
+                    <div style="background:var(--ak-gray-50);padding:16px;border-radius:var(--radius-md);text-align:center;">
+                        <div style="font-size:11px;color:var(--ak-gray-400);font-weight:600;">EVENTS</div>
+                        <div id="wd-stat-events" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-success);">0</div>
+                    </div>
+                    <div style="background:var(--ak-gray-50);padding:16px;border-radius:var(--radius-md);text-align:center;">
+                        <div style="font-size:11px;color:var(--ak-gray-400);font-weight:600;">DESIGN ORDERS</div>
+                        <div id="wd-stat-orders" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-info);">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const user = getUser();
+    const role = getUserRole();
+    let allOrders = [];
+
+    // Determine MBD sub-role
+    let mbdRole = null;
+    const match = role.match(/mbd\s*\(([^)]+)\)/);
+    if (match) mbdRole = match[1].trim().toLowerCase();
+    if (mbdRole) {
+        document.getElementById('mbd-subtitle').textContent = `Divisi: ${mbdRole.charAt(0).toUpperCase() + mbdRole.slice(1)}`;
+    }
+
+    async function init() {
+        await Promise.all([loadOrders(), loadWebDevStats(), loadWebDevEvents()]);
+    }
+
+    async function loadOrders() {
+        try {
+            let query = db.from('design_orders').select('*').order('created_at', { ascending: false });
+            // Filter by MBD sub-role if applicable
+            if (mbdRole && mbdRole !== 'mbd') {
+                const typeMap = {
+                    'ilustrator': 'Ilustrasi',
+                    'desain grafis': 'Desain Grafis',
+                    'video editor': 'Video',
+                    'multimedia': 'Multimedia'
+                };
+                const filterType = typeMap[mbdRole];
+                if (filterType) query = query.eq('design_type', filterType);
+            }
+            const { data } = await query;
+            allOrders = data || [];
+            renderOrders(allOrders);
+        } catch(e) {}
+    }
+
+    function renderOrders(list) {
+        const grid = document.getElementById('mbd-orders-grid');
+        if (list.length === 0) {
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--ak-gray-400);padding:32px;">Belum ada order design.</p>';
+            return;
+        }
+        grid.innerHTML = list.map(o => `
+            <div class="card" style="padding:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+                    <div>
+                        <h4 style="font-size:15px;font-weight:700;">${o.event_name}</h4>
+                        <span class="badge badge-purple" style="margin-top:4px;">${o.design_type}</span>
+                    </div>
+                    <span class="badge ${o.status === 'done' ? 'badge-success' : o.status === 'in_progress' ? 'badge-info' : 'badge-gold'}">${o.status || 'pending'}</span>
+                </div>
+                <p style="font-size:13px;color:var(--ak-gray-500);margin-bottom:8px;">${o.brief || 'Tidak ada brief'}</p>
+                ${o.photo_link ? `<a href="${o.photo_link}" target="_blank" style="font-size:12px;color:var(--ak-info);">📸 Foto Mentor</a>` : ''}
+                <div style="font-size:11px;color:var(--ak-gray-400);margin-top:8px;">Dari: ${o.ordered_by} • ${timeAgo(o.created_at)}</div>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button onclick="mbdUpdateOrder('${o.id}','in_progress')" class="btn btn-ghost btn-sm" style="flex:1;">🔄 In Progress</button>
+                    <button onclick="mbdUpdateOrder('${o.id}','done')" class="btn btn-primary btn-sm" style="flex:1;">✅ Done</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.mbdFilterOrders = function(type, btn) {
+        document.querySelectorAll('.mbd-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (type === 'all') renderOrders(allOrders);
+        else renderOrders(allOrders.filter(o => o.design_type === type));
+    };
+
+    window.mbdUpdateOrder = async function(id, status) {
+        try {
+            await db.from('design_orders').update({ status }).eq('id', id);
+            showToast(`Order updated to ${status}!`, "success");
+            loadOrders();
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+    };
+
+    window.mbdTab = function(tab, btn) {
+        document.querySelectorAll('.mbd-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('mbd-tab-' + tab).style.display = 'block';
+        document.querySelectorAll('.mbd-tab').forEach(b => b.className = 'btn btn-ghost btn-sm mbd-tab');
+        btn.className = 'btn btn-primary btn-sm mbd-tab active';
+    };
+
+    window.mbdUploadEvent = async function() {
+        const title = document.getElementById('mbd-ev-title').value.trim();
+        if (!title) return showToast("Isi judul!", "warning");
+        setLoading("mbd-ev-btn", true);
+        try {
+            await db.from('events').insert([{
+                title, description: document.getElementById('mbd-ev-desc').value,
+                image_url: document.getElementById('mbd-ev-image').value,
+                visibility: document.getElementById('mbd-ev-vis').value,
+                created_by: user.email
+            }]);
+            showToast("Event berhasil diupload!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("mbd-ev-btn", false); }
+    };
+
+    // Web Dev Control functions
+    async function loadWebDevStats() {
+        try {
+            const [u, p, e, o] = await Promise.all([
+                db.from('profiles').select('*', { count: 'exact', head: true }),
+                db.from('prestasi').select('*', { count: 'exact', head: true }),
+                db.from('events').select('*', { count: 'exact', head: true }),
+                db.from('design_orders').select('*', { count: 'exact', head: true })
+            ]);
+            document.getElementById('wd-stat-users').textContent = u.count || 0;
+            document.getElementById('wd-stat-prestasi').textContent = p.count || 0;
+            document.getElementById('wd-stat-events').textContent = e.count || 0;
+            document.getElementById('wd-stat-orders').textContent = o.count || 0;
+        } catch(e) {}
+    }
+
+    async function loadWebDevEvents() {
+        try {
+            const { data } = await db.from('events').select('*').order('created_at', { ascending: false }).limit(10);
+            const box = document.getElementById('wd-events');
+            if (data && data.length > 0) {
+                box.innerHTML = data.map(ev => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--ak-gray-50);border-radius:var(--radius-sm);">
+                        <div>
+                            <div style="font-weight:600;font-size:13px;">${ev.title}</div>
+                            <div style="font-size:11px;color:var(--ak-gray-400);">${ev.visibility || 'all'} • ${timeAgo(ev.created_at)}</div>
+                        </div>
+                        <button onclick="wdDeleteEvent('${ev.id}')" style="background:none;border:none;cursor:pointer;color:var(--ak-danger);font-size:14px;">🗑️</button>
+                    </div>
+                `).join('');
+            } else {
+                box.innerHTML = '<p style="color:var(--ak-gray-400);font-size:13px;">Belum ada event.</p>';
+            }
+        } catch(e) {}
+    }
+
+    window.wdDeleteEvent = async function(id) {
+        showModal("Hapus Event", "Yakin mau hapus event ini?", async () => {
+            try {
+                await db.from('events').delete().eq('id', id);
+                showToast("Event dihapus!", "success");
+                loadWebDevEvents();
+            } catch(e) { showToast("Error: " + e.message, "error"); }
+        });
+    };
+
+    window.wdPublishLomba = async function() {
+        const title = document.getElementById('wd-lomba-title').value.trim();
+        if (!title) return showToast("Isi judul lomba!", "warning");
+        setLoading("wd-lomba-btn", true);
+        try {
+            await db.from('info_lomba').insert([{
+                title, description: document.getElementById('wd-lomba-desc').value,
+                registration_link: document.getElementById('wd-lomba-link').value,
+                guidebook_link: document.getElementById('wd-lomba-guide').value,
+                poster_url: document.getElementById('wd-lomba-poster').value,
+                published_by: user.email
+            }]);
+            showToast("Info lomba berhasil dipublish!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("wd-lomba-btn", false); }
+    };
+
+    window.wdPublishFasilitas = async function() {
+        const title = document.getElementById('wd-fas-title').value.trim();
+        if (!title) return showToast("Isi judul!", "warning");
+        setLoading("wd-fas-btn", true);
+        try {
+            await db.from('fasilitas').insert([{
+                title, description: document.getElementById('wd-fas-desc').value,
+                link: document.getElementById('wd-fas-link').value,
+                published_by: user.email
+            }]);
+            showToast("Fasilitas berhasil dipublish!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("wd-fas-btn", false); }
+    };
+
+    init();
+})();
+</script>
