@@ -1,0 +1,95 @@
+<div class="animate-fadeInUp" style="max-width:900px;">
+    <div style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gray-900);">📅 Event & Mentoring</h2>
+        <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;">Ikuti kegiatan cluster dan tingkatkan peluang prestasi</p>
+    </div>
+
+    <div id="ev-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;">
+        <div class="card"><div class="skeleton" style="height:220px;"></div><div style="padding:20px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:14px;width:50%;"></div></div></div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    const user = getUser();
+    if (!user) return;
+
+    try {
+        const { data } = await db.from('events').select('*');
+        const container = document.getElementById('ev-container');
+
+        if (data && data.length > 0) {
+            container.innerHTML = data.map(ev => `
+                <div class="card" style="overflow:hidden;">
+                    <div style="position:relative;">
+                        <img src="${ev.image_url || 'https://placehold.co/600x300/6d28d9/white?text=Event'}" 
+                            style="width:100%;height:220px;object-fit:cover;" loading="lazy">
+                        <span class="badge badge-purple" style="position:absolute;top:12px;left:12px;font-size:10px;">
+                            ${ev.type || 'Mentoring'}
+                        </span>
+                    </div>
+                    <div style="padding:20px;">
+                        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px;">${ev.title}</h3>
+                        <p style="font-size:13px;color:var(--ak-gray-500);margin-bottom:12px;">${ev.description || ''}</p>
+                        <div style="font-size:13px;color:var(--ak-gray-500);display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+                            <span>⏰ ${ev.date || '-'} • ${ev.time || ''}</span>
+                            <span>💻 ${ev.platform || ev.location || 'TBA'}</span>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="confirmEvent('${ev.id}','Hadir')" class="btn btn-primary btn-sm" style="flex:1;">
+                                ✔ Hadir
+                            </button>
+                            <button onclick="toggleAbsen('absen-${ev.id}')" class="btn btn-ghost btn-sm" style="flex:1;">
+                                ❌ Tidak Hadir
+                            </button>
+                        </div>
+                        <div id="absen-${ev.id}" style="display:none;margin-top:12px;">
+                            <textarea id="alasan-${ev.id}" class="form-textarea" placeholder="Tulis alasan tidak hadir..." style="min-height:60px;"></textarea>
+                            <button onclick="confirmEvent('${ev.id}','Absen')" class="btn btn-danger btn-sm" style="margin-top:8px;">
+                                Kirim ke Staff HEG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--ak-gray-400);">Belum ada event terdekat.</div>';
+        }
+    } catch(e) {
+        console.log("Events:", e);
+    }
+})();
+
+function toggleAbsen(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function confirmEvent(eventId, status) {
+    const user = getUser();
+    if (!user) return;
+
+    if (status === 'Absen') {
+        const alasan = document.getElementById('alasan-' + eventId)?.value;
+        if (!alasan || !alasan.trim()) return showToast("Isi alasan dulu!", "warning");
+
+        try {
+            await db.from('event_attendance').insert([{
+                event_id: eventId, email: user.email,
+                member_name: user.name || user.full_name,
+                status: 'Tidak Hadir', alasan: alasan
+            }]);
+            showToast("Alasan tidak hadir berhasil dikirim!", "info");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+    } else {
+        try {
+            await db.from('event_attendance').insert([{
+                event_id: eventId, email: user.email,
+                member_name: user.name || user.full_name,
+                status: 'Hadir', alasan: null
+            }]);
+            showToast("Konfirmasi kehadiran berhasil! 🔥", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+}
+</script>

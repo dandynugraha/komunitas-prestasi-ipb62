@@ -1,0 +1,132 @@
+<div class="animate-fadeInUp" style="max-width:720px;">
+    <div style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gray-900);">🏆 Lapor Prestasi</h2>
+        <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;">Upload pencapaianmu dan dapatkan poin</p>
+    </div>
+
+    <div class="card" style="padding:28px;">
+        <!-- DROPZONE -->
+        <div id="up-dropzone" style="border:2px dashed var(--ak-gray-300);border-radius:var(--radius-lg);padding:40px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:24px;"
+            onmouseover="this.style.borderColor='var(--ak-violet)';this.style.background='rgba(139,92,246,.03)'"
+            onmouseout="this.style.borderColor='var(--ak-gray-300)';this.style.background='transparent'"
+        >
+            <div style="font-size:36px;margin-bottom:8px;">📁</div>
+            <p style="font-weight:600;color:var(--ak-gray-600);">Drag & drop gambar prestasi</p>
+            <p style="font-size:12px;color:var(--ak-gray-400);margin-top:4px;">atau klik untuk upload (landscape)</p>
+            <input type="file" id="up-file" accept="image/*" style="display:none;">
+            <img id="up-preview" style="display:none;max-height:200px;margin:16px auto 0;border-radius:var(--radius-md);box-shadow:var(--shadow-md);">
+        </div>
+
+        <h3 style="font-size:15px;font-weight:700;color:var(--ak-gray-700);margin-bottom:16px;">Informasi Prestasi</h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+                <label class="form-label">Tanggal</label>
+                <input id="up-tanggal" type="date" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Peringkat</label>
+                <select id="up-title" class="form-select">
+                    <option>Juara 1</option><option>Juara 2</option><option>Juara 3</option><option>Finalis</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tingkat</label>
+                <select id="up-tingkat" class="form-select">
+                    <option>Internasional</option><option>Nasional</option><option>Provinsi</option><option>Universitas</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Metode</label>
+                <select id="up-metode" class="form-select" onchange="document.getElementById('up-lokasi').placeholder = this.value==='online'?'Platform (Zoom, dll)':this.value==='hybrid'?'Platform / Tempat':'Nama Tempat'">
+                    <option value="offline">Offline</option><option value="online">Online</option><option value="hybrid">Hybrid</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Lokasi</label>
+                <input id="up-lokasi" placeholder="Nama Tempat" class="form-input">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Cluster / Bidang</label>
+                <select id="up-cluster" class="form-select">
+                    <option value="">-- Pilih Cluster --</option>
+                    <option>Bisnis</option><option>Desain</option><option>Penulisan</option><option>Olimpiade</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Cerita Pengalaman</label>
+                <textarea id="up-story" class="form-textarea" placeholder="Ceritakan pengalamanmu mengikuti lomba ini..."></textarea>
+            </div>
+        </div>
+
+        <button onclick="uploadPrestasi()" id="up-btn" class="btn btn-gold btn-lg btn-block" style="margin-top:8px;">
+            🚀 Upload & Publish
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    let selectedFile = null;
+    const dropzone = document.getElementById("up-dropzone");
+    const input = document.getElementById("up-file");
+    const preview = document.getElementById("up-preview");
+
+    dropzone.addEventListener("click", () => input.click());
+    input.addEventListener("change", e => handleFile(e.target.files[0]));
+    dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.style.borderColor = 'var(--ak-violet)'; });
+    dropzone.addEventListener("dragleave", () => { dropzone.style.borderColor = 'var(--ak-gray-300)'; });
+    dropzone.addEventListener("drop", e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); });
+
+    function handleFile(file) {
+        if (!file) return;
+        selectedFile = file;
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    }
+
+    window.uploadPrestasi = async function() {
+        const user = getUser();
+        if (!user) return showToast("Login dulu!", "error");
+        if (!selectedFile) return showToast("Upload gambar dulu!", "warning");
+
+        const cluster = document.getElementById("up-cluster").value;
+        if (!cluster) return showToast("Pilih cluster!", "warning");
+
+        setLoading("up-btn", true);
+        try {
+            const url = await uploadFile("prestasi-images", selectedFile);
+            const points = calculatePoints(
+                document.getElementById("up-tingkat").value,
+                document.getElementById("up-title").value
+            );
+
+            await db.from("prestasi").insert([{
+                title: document.getElementById("up-title").value,
+                tingkat: document.getElementById("up-tingkat").value,
+                cluster: cluster,
+                lokasi: document.getElementById("up-lokasi").value,
+                metode: document.getElementById("up-metode").value,
+                story: document.getElementById("up-story").value,
+                tanggal: document.getElementById("up-tanggal").value,
+                foto_url: url,
+                email_user: user.email,
+                member_name: user.name || user.full_name,
+                points_given: points
+            }]);
+
+            // Update user points
+            const { data: profile } = await db.from('profiles').select('points').eq('email', user.email).single();
+            const newPoints = (profile?.points || 0) + points;
+            await db.from('profiles').update({ points: newPoints }).eq('email', user.email);
+
+            showToast(`Prestasi berhasil diupload! +${points} poin 🔥`, "success");
+            setTimeout(() => loadPage('pages/home-dashboard.html','Dashboard',document.querySelector('.menu-item')), 1500);
+        } catch(err) {
+            showToast("Error: " + err.message, "error");
+        } finally {
+            setLoading("up-btn", false);
+        }
+    };
+})();
+</script>
