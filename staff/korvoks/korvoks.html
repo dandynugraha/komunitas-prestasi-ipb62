@@ -1,0 +1,165 @@
+<div class="animate-fadeInUp">
+    <div style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gray-900);">🤝 Korvoks Panel</h2>
+        <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;">Koordinator Vokasi — Kelola anggota korvoks & event</p>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+        <button onclick="kvTab('members',this)" class="btn btn-primary btn-sm kv-tab active">👥 Anggota Korvoks</button>
+        <button onclick="kvTab('event',this)" class="btn btn-ghost btn-sm kv-tab">📅 Upload Event</button>
+        <button onclick="kvTab('design',this)" class="btn btn-ghost btn-sm kv-tab">🎨 Pesan Design</button>
+    </div>
+
+    <!-- MEMBERS -->
+    <div id="kv-tab-members" class="kv-panel">
+        <div class="card">
+            <div style="padding:16px 24px;border-bottom:1px solid var(--ak-gray-100);display:flex;justify-content:space-between;align-items:center;">
+                <h3 style="font-size:16px;font-weight:700;">Daftar Anggota Korvoks</h3>
+                <input id="kv-search" class="form-input" placeholder="Cari nama..." style="max-width:220px;padding:8px 14px;font-size:13px;" oninput="kvFilter()">
+            </div>
+            <div style="padding:0 24px;max-height:500px;overflow-y:auto;">
+                <table class="table">
+                    <thead><tr><th>Nama</th><th>Email</th><th>Cluster</th><th>Poin</th></tr></thead>
+                    <tbody id="kv-member-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD EVENT -->
+    <div id="kv-tab-event" class="kv-panel" style="display:none;">
+        <div class="card" style="padding:28px;max-width:600px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Upload Event Korvoks</h3>
+            <div class="form-group">
+                <label class="form-label">Judul Event</label>
+                <input id="kv-ev-title" class="form-input" placeholder="Nama event">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea id="kv-ev-desc" class="form-textarea" placeholder="Penjelasan..."></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group">
+                    <label class="form-label">Link Poster</label>
+                    <input id="kv-ev-image" class="form-input" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Visibilitas</label>
+                    <select id="kv-ev-vis" class="form-select">
+                        <option value="all">Anggota Saja</option>
+                        <option value="public">Public</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="kvUploadEvent()" id="kv-ev-btn" class="btn btn-primary btn-block">Upload Event</button>
+        </div>
+    </div>
+
+    <!-- DESIGN ORDER -->
+    <div id="kv-tab-design" class="kv-panel" style="display:none;">
+        <div class="card" style="padding:28px;max-width:600px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">🎨 Pesan Design ke MBD</h3>
+            <div class="form-group">
+                <label class="form-label">Nama Event</label>
+                <input id="kv-ds-event" class="form-input" placeholder="Nama event">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group">
+                    <label class="form-label">Jenis Design</label>
+                    <select id="kv-ds-type" class="form-select">
+                        <option>Ilustrasi</option><option>Desain Grafis</option><option>Video</option><option>Multimedia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Foto Mentor (Drive)</label>
+                    <input id="kv-ds-photo" class="form-input" placeholder="https://drive.google.com/...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Brief</label>
+                <textarea id="kv-ds-brief" class="form-textarea" placeholder="Detail kebutuhan..."></textarea>
+            </div>
+            <button onclick="kvOrderDesign()" id="kv-ds-btn" class="btn btn-gold btn-block">Kirim ke MBD</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const user = getUser();
+    let allMembers = [];
+
+    async function init() {
+        try {
+            const { data } = await db.from('profiles').select('*').ilike('role', '%korvoks%').order('name');
+            allMembers = data || [];
+            renderMembers(allMembers);
+        } catch(e) {}
+    }
+
+    function renderMembers(list) {
+        const tbody = document.getElementById('kv-member-list');
+        if (!list.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ak-gray-400);">Tidak ditemukan.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(m => `
+            <tr style="cursor:pointer;" onclick="kvShowMember('${m.email}')">
+                <td><b>${m.name || '-'}</b></td>
+                <td style="font-size:13px;color:var(--ak-gray-500);">${m.email}</td>
+                <td>${getClusterBadge(m.cluster || '-')}</td>
+                <td style="font-family:var(--font-display);font-weight:700;color:var(--ak-gold);">${m.points || 0}</td>
+            </tr>
+        `).join('');
+    }
+
+    window.kvFilter = function() {
+        const q = document.getElementById('kv-search').value.toLowerCase();
+        renderMembers(allMembers.filter(m => (m.name || m.email || '').toLowerCase().includes(q)));
+    };
+
+    window.kvShowMember = async function(email) {
+        try {
+            const [{ data: p }, { data: l }] = await Promise.all([
+                db.from('prestasi').select('title,tingkat').eq('email_user', email),
+                db.from('lomba_tracking').select('nama_lomba,status').eq('email', email)
+            ]);
+            let msg = `<b>Prestasi:</b> ${p?.length || 0} | <b>Lomba:</b> ${l?.length || 0}`;
+            if (p?.length) msg += '<br><br>' + p.map(x => `• ${x.title} (${x.tingkat})`).join('<br>');
+            showModal(`Detail: ${email}`, msg, null);
+        } catch(e) {}
+    };
+
+    window.kvTab = function(tab, btn) {
+        document.querySelectorAll('.kv-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('kv-tab-' + tab).style.display = 'block';
+        document.querySelectorAll('.kv-tab').forEach(b => b.className = 'btn btn-ghost btn-sm kv-tab');
+        btn.className = 'btn btn-primary btn-sm kv-tab active';
+    };
+
+    window.kvUploadEvent = async function() {
+        const title = document.getElementById('kv-ev-title').value.trim();
+        if (!title) return showToast("Isi judul!", "warning");
+        setLoading("kv-ev-btn", true);
+        try {
+            await db.from('events').insert([{ title, description: document.getElementById('kv-ev-desc').value, image_url: document.getElementById('kv-ev-image').value, visibility: document.getElementById('kv-ev-vis').value, created_by: user.email }]);
+            showToast("Event berhasil diupload!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("kv-ev-btn", false); }
+    };
+
+    window.kvOrderDesign = async function() {
+        const ev = document.getElementById('kv-ds-event').value.trim();
+        if (!ev) return showToast("Isi nama event!", "warning");
+        setLoading("kv-ds-btn", true);
+        try {
+            await db.from('design_orders').insert([{ event_name: ev, design_type: document.getElementById('kv-ds-type').value, photo_link: document.getElementById('kv-ds-photo').value, brief: document.getElementById('kv-ds-brief').value, ordered_by: user.email, status: 'pending' }]);
+            showToast("Order terkirim ke MBD!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("kv-ds-btn", false); }
+    };
+
+    init();
+})();
+</script>
