@@ -1,0 +1,118 @@
+<div class="animate-fadeInUp">
+    <!-- WELCOME -->
+    <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <div>
+            <h2 style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-gray-900);">
+                Halo, <span id="hd-name">User</span> 👋
+            </h2>
+            <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;">Selamat datang kembali di Portal Aksara Karya 62</p>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px 24px;">
+            <div style="width:44px;height:44px;border-radius:var(--radius-md);background:linear-gradient(135deg,#f59e0b,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:20px;">⭐</div>
+            <div>
+                <div style="font-size:11px;font-weight:700;color:var(--ak-gray-400);text-transform:uppercase;letter-spacing:.5px;">Total Poin</div>
+                <div id="hd-points" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gold);">0 pts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px;" class="stagger">
+        <div class="card" style="padding:20px;">
+            <div style="font-size:12px;color:var(--ak-gray-500);font-weight:500;">Total Prestasi</div>
+            <div id="hd-prestasi" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-gray-900);margin-top:4px;">0</div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div style="font-size:12px;color:var(--ak-gray-500);font-weight:500;">Total Plan</div>
+            <div id="hd-plans" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--ak-gray-900);margin-top:4px;">0</div>
+        </div>
+        <div class="card" style="padding:20px;">
+            <div style="font-size:12px;color:var(--ak-gray-500);font-weight:500;">Status</div>
+            <div style="margin-top:6px;"><span class="badge badge-success">Aktif</span></div>
+        </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;">
+        <!-- PRESTASI -->
+        <div class="card">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--ak-gray-100);display:flex;align-items:center;justify-content:space-between;">
+                <h3 style="font-size:16px;font-weight:700;">🏆 Riwayat Prestasi</h3>
+            </div>
+            <div style="padding:0 24px;">
+                <table class="table" style="width:100%;">
+                    <tbody id="hd-achievement-list">
+                        <tr><td style="text-align:center;padding:32px;color:var(--ak-gray-400);font-style:italic;">Memuat...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PLANS -->
+        <div class="card">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--ak-gray-100);">
+                <h3 style="font-size:16px;font-weight:700;">📅 Rencana Mendatang</h3>
+            </div>
+            <div style="padding:16px 24px;" id="hd-plan-list">
+                <p style="color:var(--ak-gray-400);font-style:italic;text-align:center;padding:24px 0;">Memuat...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function() {
+    const user = getUser();
+    if (!user) return;
+
+    document.getElementById('hd-name').textContent = user.name || user.full_name || "User";
+
+    // Points
+    try {
+        const { data: profile } = await db.from('profiles').select('points').eq('email', user.email).single();
+        if (profile) document.getElementById('hd-points').textContent = `${profile.points || 0} pts`;
+    } catch(e) {}
+
+    // Prestasi
+    try {
+        const { data: prestasis } = await db.from('prestasi').select('*').eq('email_user', user.email);
+        document.getElementById('hd-prestasi').textContent = prestasis ? prestasis.length : 0;
+        const list = document.getElementById('hd-achievement-list');
+        if (prestasis && prestasis.length > 0) {
+            list.innerHTML = prestasis.map(p => `
+                <tr>
+                    <td style="padding:12px 0;">
+                        <div style="font-weight:600;font-size:14px;">${p.title}</div>
+                        <div style="font-size:12px;color:var(--ak-gray-400);">${p.tingkat || ''} • ${p.cluster || ''}</div>
+                    </td>
+                    <td style="text-align:right;padding:12px 0;">
+                        <span style="font-family:var(--font-display);font-weight:700;color:var(--ak-gold);">+${p.points_given || 0}</span>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            list.innerHTML = '<tr><td style="text-align:center;padding:32px;color:var(--ak-gray-400);">Belum ada prestasi.</td></tr>';
+        }
+    } catch(e) {}
+
+    // Plans
+    try {
+        const { data: plans } = await db.from('user_plans').select('*').eq('email', user.email).order('tanggal', { ascending: true }).limit(5);
+        document.getElementById('hd-plans').textContent = plans ? plans.length : 0;
+        const planBox = document.getElementById('hd-plan-list');
+        if (plans && plans.length > 0) {
+            planBox.innerHTML = plans.map(pl => `
+                <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--ak-gray-50);">
+                    <div style="min-width:48px;text-align:center;background:var(--ak-purple);color:white;padding:8px;border-radius:var(--radius-sm);">
+                        <div style="font-size:9px;text-transform:uppercase;opacity:.7;">${new Date(pl.tanggal).toLocaleString('id-ID',{month:'short'})}</div>
+                        <div style="font-size:16px;font-weight:700;">${new Date(pl.tanggal).getDate()}</div>
+                    </div>
+                    <div style="font-size:14px;font-weight:500;color:var(--ak-gray-700);">${pl.catatan}</div>
+                </div>
+            `).join('');
+        } else {
+            planBox.innerHTML = '<p style="color:var(--ak-gray-400);text-align:center;padding:24px 0;">Belum ada rencana.</p>';
+        }
+    } catch(e) {}
+})();
+</script>
