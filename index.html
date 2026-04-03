@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aksara Karya 62 — Komunitas Prestasi IPB University</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* ====== NAVBAR ====== */
+        .nav-main {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 12px 0;
+            transition: all .3s ease;
+        }
+        .nav-main.scrolled {
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 20px rgba(0,0,0,.06);
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo img { height: 44px; }
+        .nav-links { display: flex; align-items: center; gap: 8px; }
+        .nav-links a {
+            padding: 8px 16px; font-size: 14px; font-weight: 500;
+            color: rgba(255,255,255,.85); text-decoration: none;
+            border-radius: var(--radius-sm); transition: all .2s;
+        }
+        .nav-main.scrolled .nav-links a { color: var(--ak-gray-600); }
+        .nav-links a:hover { background: rgba(255,255,255,.12); color: white; }
+        .nav-main.scrolled .nav-links a:hover { background: rgba(109,40,217,.06); color: var(--ak-purple); }
+        .nav-login {
+            background: rgba(255,255,255,.15) !important;
+            border: 1px solid rgba(255,255,255,.25) !important;
+            color: white !important; font-weight: 600 !important;
+        }
+        .nav-main.scrolled .nav-login {
+            background: var(--ak-purple) !important;
+            border-color: var(--ak-purple) !important;
+            color: white !important;
+        }
+        .hamburger { display: none; background: none; border: none; font-size: 24px; color: white; cursor: pointer; }
+        .nav-main.scrolled .hamburger { color: var(--ak-gray-700); }
+
+        /* ====== HERO ====== */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0f0a2e 0%, #1e1b4b 30%, #6d28d9 70%, #9333ea 100%);
+            position: relative; overflow: hidden;
+            display: flex; align-items: center;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(139,92,246,.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(245,158,11,.15) 0%, transparent 40%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0; opacity: .04;
+            background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 780px; margin: 0 auto; padding: 120px 24px 80px; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.3);
+            padding: 8px 20px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 600; color: var(--ak-gold-light);
+            margin-bottom: 28px;
+        }
+        .hero h1 {
+            font-family: var(--font-display); font-size: clamp(40px, 7vw, 72px);
+            font-weight: 700; color: white; line-height: 1.1; margin-bottom: 20px;
+        }
+        .hero h1 span { color: var(--ak-gold-light); }
+        .hero p { font-size: 18px; color: rgba(255,255,255,.7); max-width: 560px; margin: 0 auto 36px; line-height: 1.7; }
+        .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .hero-stats {
+            display: flex; gap: 48px; justify-content: center; margin-top: 64px;
+            padding-top: 48px; border-top: 1px solid rgba(255,255,255,.1);
+        }
+        .hero-stat-num { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: white; }
+        .hero-stat-label { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 4px; }
+
+        /* ====== FLOATING SHAPES ====== */
+        .float-shape {
+            position: absolute; border-radius: 50%; opacity: .06;
+            background: white; animation: float 6s ease-in-out infinite;
+        }
+        .fs-1 { width: 300px; height: 300px; top: 10%; right: -80px; animation-delay: 0s; }
+        .fs-2 { width: 200px; height: 200px; bottom: 20%; left: -60px; animation-delay: 2s; }
+        .fs-3 { width: 120px; height: 120px; top: 40%; left: 15%; animation-delay: 4s; }
+
+        /* ====== SECTIONS ====== */
+        .section { padding: 80px 0; }
+        .section-header { text-align: center; margin-bottom: 48px; }
+        .section-header h2 {
+            font-family: var(--font-display); font-size: 32px; font-weight: 700;
+            color: var(--ak-gray-900); margin-bottom: 12px;
+        }
+        .section-header p { color: var(--ak-gray-500); font-size: 16px; max-width: 520px; margin: 0 auto; }
+        .section-alt { background: white; }
+
+        /* ====== STORY CARDS ====== */
+        .stories-scroll {
+            display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px;
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+        }
+        .stories-scroll::-webkit-scrollbar { height: 6px; }
+        .stories-scroll::-webkit-scrollbar-track { background: var(--ak-gray-100); border-radius: 3px; }
+        .stories-scroll::-webkit-scrollbar-thumb { background: var(--ak-gray-300); border-radius: 3px; }
+        .story-card {
+            min-width: 300px; scroll-snap-align: start;
+            border-radius: var(--radius-lg); overflow: hidden;
+            background: white; box-shadow: var(--shadow-md);
+            border: 1px solid var(--ak-gray-100);
+            transition: all .3s;
+        }
+        .story-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+        .story-card img { width: 100%; height: 200px; object-fit: cover; }
+        .story-card .story-info { padding: 20px; }
+        .story-card h3 { font-size: 16px; font-weight: 700; color: var(--ak-gray-800); margin-bottom: 6px; }
+        .story-card p { font-size: 13px; color: var(--ak-gray-500); }
+
+        /* ====== CLUSTER STATS ====== */
+        .cluster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .cluster-card {
+            padding: 28px 24px; border-radius: var(--radius-lg);
+            color: white; position: relative; overflow: hidden;
+            cursor: pointer; transition: all .3s;
+        }
+        .cluster-card:hover { transform: translateY(-4px); }
+        .cluster-card::after {
+            content: ''; position: absolute; top: -30%; right: -20%;
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(255,255,255,.12);
+        }
+        .cluster-card .cluster-name { font-size: 14px; font-weight: 600; opacity: .9; }
+        .cluster-card .cluster-count {
+            font-family: var(--font-display); font-size: 42px; font-weight: 700; margin-top: 8px;
+        }
+        .c-bisnis { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .c-desain { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .c-penulisan { background: linear-gradient(135deg, #10b981, #059669); }
+        .c-olimpiade { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .c-total { background: linear-gradient(135deg, #6d28d9, #4c1d95); }
+
+        /* ====== LEADERBOARD ====== */
+        .lb-card { border-radius: var(--radius-lg); overflow: hidden; }
+        .lb-rank { font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+        .lb-rank.gold { color: #f59e0b; }
+        .lb-rank.silver { color: #94a3b8; }
+        .lb-rank.bronze { color: #d97706; }
+        .lb-name { font-weight: 600; }
+        .lb-points { font-family: var(--font-display); font-weight: 700; color: var(--ak-gold); }
+
+        /* ====== EVENTS ====== */
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .event-card { border-radius: var(--radius-lg); overflow: hidden; background: white; box-shadow: var(--shadow-md); border: 1px solid var(--ak-gray-100); }
+        .event-card img { width: 100%; height: 300px; object-fit: cover; }
+        .event-card .event-info { padding: 20px; }
+        .event-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .event-card p { font-size: 13px; color: var(--ak-gray-500); margin-bottom: 12px; }
+
+        /* ====== PROJECTS ====== */
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .project-card { padding: 24px; border-radius: var(--radius-lg); background: white; box-shadow: var(--shadow-md); border: 1px solid var(--ak-gray-100); }
+        .project-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--ak-gray-900); margin: 12px 0 8px; }
+        .progress-bar-wrap { height: 8px; background: var(--ak-gray-100); border-radius: 4px; margin-top: 16px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--ak-purple), var(--ak-violet)); border-radius: 4px; transition: width 1s ease; }
+
+        /* ====== FASILITAS ====== */
+        .facility-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .facility-card {
+            padding: 32px; border-radius: var(--radius-lg); background: white;
+            box-shadow: var(--shadow-md); border: 1px solid var(--ak-gray-100);
+            text-align: center; transition: all .3s;
+        }
+        .facility-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+        .facility-icon { font-size: 40px; margin-bottom: 16px; }
+        .facility-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .facility-card p { font-size: 14px; color: var(--ak-gray-500); margin-bottom: 20px; line-height: 1.6; }
+
+        /* ====== FAQ ====== */
+        .faq-item {
+            background: white; border-radius: var(--radius-md); margin-bottom: 10px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--ak-gray-100); overflow: hidden;
+        }
+        .faq-q {
+            padding: 18px 24px; cursor: pointer; font-weight: 600; font-size: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background .2s;
+        }
+        .faq-q:hover { background: var(--ak-gray-50); }
+        .faq-a {
+            max-height: 0; overflow: hidden; transition: max-height .3s ease;
+            padding: 0 24px; color: var(--ak-gray-600); font-size: 14px; line-height: 1.7;
+        }
+        .faq-item.open .faq-a { max-height: 300px; padding: 0 24px 18px; }
+        .faq-item.open .faq-arrow { transform: rotate(180deg); }
+        .faq-arrow { transition: transform .3s; color: var(--ak-gray-400); }
+
+        /* ====== FOOTER ====== */
+        .footer {
+            background: var(--ak-gray-900); color: rgba(255,255,255,.6); padding: 48px 0 24px;
+        }
+        .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+        .footer-brand h3 { color: white; font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .footer-brand p { font-size: 13px; }
+        .footer-socials { display: flex; gap: 12px; }
+        .footer-socials a {
+            width: 42px; height: 42px; border-radius: var(--radius-full);
+            background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.6); font-size: 18px; transition: all .2s; text-decoration: none;
+        }
+        .footer-socials a:hover { background: var(--ak-purple); color: white; }
+        .footer-bottom {
+            text-align: center; padding-top: 24px; margin-top: 24px;
+            border-top: 1px solid rgba(255,255,255,.08); font-size: 13px;
+        }
+
+        /* ====== MOBILE ====== */
+        @media (max-width: 768px) {
+            .nav-links { 
+                display: none; flex-direction: column; position: absolute;
+                top: 100%; left: 0; right: 0; background: white;
+                padding: 16px; box-shadow: var(--shadow-lg);
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            }
+            .nav-links.show { display: flex; }
+            .nav-links a { color: var(--ak-gray-700) !important; }
+            .nav-login { background: var(--ak-purple) !important; color: white !important; }
+            .hamburger { display: block; }
+            .hero h1 { font-size: 36px; }
+            .hero p { font-size: 16px; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            .section { padding: 48px 0; }
+            .story-card { min-width: 260px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ====== NAVBAR ====== -->
+<header class="nav-main" id="navbar">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">
+            <img src="images/logo.png" alt="Aksara Karya 62">
+        </a>
+        <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <nav class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#lomba">Info Lomba</a>
+            <a href="#event">Event</a>
+            <a href="#fasilitas">Fasilitas</a>
+            <a href="#about">About</a>
+            <a href="#faq">FAQ</a>
+            <a href="login.html" class="nav-login">Login</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ====== HERO ====== -->
+<section class="hero" id="home">
+    <div class="hero-grid"></div>
+    <div class="float-shape fs-1"></div>
+    <div class="float-shape fs-2"></div>
+    <div class="float-shape fs-3"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-fire"></i> Kabinet Rona — Periode 2025
+        </div>
+        <h1>Grow. Inspire.<br><span>Excellence.</span></h1>
+        <p>Komunitas Prestasi IPB University yang mendorong mahasiswa meraih prestasi di bidang Bisnis, Desain, Penulisan, dan Olimpiade.</p>
+        <div class="hero-actions">
+            <a href="login.html" class="btn btn-gold btn-lg">
+                <i class="fa-solid fa-rocket"></i> Masuk Portal
+            </a>
+            <a href="#about" class="btn btn-lg" style="background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.2);">
+                <i class="fa-solid fa-info-circle"></i> Tentang Kami
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div>
+                <div class="hero-stat-num" id="stat-members">105</div>
+                <div class="hero-stat-label">Anggota Aktif</div>
+            </div>
+            <div>
+                <div class="hero-stat-num">4</div>
+                <div class="hero-stat-label">Cluster</div>
+            </div>
+            <div>
+                <div class="hero-stat-num" id="stat-achievements">0</div>
+                <div class="hero-stat-label">Prestasi</div>
+            </div>
+            <div>
+                <div class="hero-stat-num" id="stat-projects">0</div>
+                <div class="hero-stat-label">Proyek</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== CERITA KOMUNITAS ====== -->
+<section class="section" id="stories">
+    <div class="container">
+        <div class="section-header">
+            <h2>🏆 Cerita Komunitas Prestasi</h2>
+            <p>Capaian terbaru dari anggota dan staff Aksara Karya 62</p>
+        </div>
+        <div class="stories-scroll stagger" id="storyContainer">
+            <div class="story-card"><div class="skeleton" style="height:200px;"></div><div style="padding:20px;"><div class="skeleton" style="height:16px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:40%;"></div></div></div>
+            <div class="story-card"><div class="skeleton" style="height:200px;"></div><div style="padding:20px;"><div class="skeleton" style="height:16px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:40%;"></div></div></div>
+            <div class="story-card"><div class="skeleton" style="height:200px;"></div><div style="padding:20px;"><div class="skeleton" style="height:16px;width:60%;margin-bottom:8px;"></div><div class="skeleton" style="height:12px;width:40%;"></div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== CAPAIAN CLUSTER ====== -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2>📊 Capaian Prestasi Cluster</h2>
+            <p>Statistik prestasi yang telah diraih di setiap bidang</p>
+        </div>
+        <div class="cluster-grid stagger">
+            <div class="cluster-card c-olimpiade">
+                <div class="cluster-name"><i class="fa-solid fa-brain"></i> Olimpiade</div>
+                <div class="cluster-count" id="countOlimpiade">0</div>
+            </div>
+            <div class="cluster-card c-bisnis">
+                <div class="cluster-name"><i class="fa-solid fa-briefcase"></i> Bisnis</div>
+                <div class="cluster-count" id="countBisnis">0</div>
+            </div>
+            <div class="cluster-card c-penulisan">
+                <div class="cluster-name"><i class="fa-solid fa-pen-fancy"></i> Penulisan</div>
+                <div class="cluster-count" id="countPenulisan">0</div>
+            </div>
+            <div class="cluster-card c-desain">
+                <div class="cluster-name"><i class="fa-solid fa-palette"></i> Desain</div>
+                <div class="cluster-count" id="countDesain">0</div>
+            </div>
+            <div class="cluster-card c-total">
+                <div class="cluster-name"><i class="fa-solid fa-trophy"></i> Total Prestasi</div>
+                <div class="cluster-count" id="countTotal">0</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== LEADERBOARD ====== -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>🥇 Top Leaderboard</h2>
+            <p>Anggota dengan poin prestasi tertinggi</p>
+        </div>
+        <div class="card lb-card" style="max-width:700px;margin:0 auto;">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">Rank</th>
+                            <th>Nama</th>
+                            <th>Cluster</th>
+                            <th style="text-align:right;">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr><td colspan="4" style="text-align:center;padding:32px;color:var(--ak-gray-400);">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== INFO LOMBA ====== -->
+<section class="section section-alt" id="lomba">
+    <div class="container">
+        <div class="section-header">
+            <h2>📢 Informasi Lomba</h2>
+            <p>Kompetisi terbaru untuk kamu ikuti dan raih prestasi</p>
+        </div>
+        <div class="events-grid" id="lombaContainer">
+            <p style="text-align:center;color:var(--ak-gray-400);grid-column:1/-1;">Memuat informasi lomba...</p>
+        </div>
+    </div>
+</section>
+
+<!-- ====== UPCOMING EVENT ====== -->
+<section class="section" id="event">
+    <div class="container">
+        <div class="section-header">
+            <h2>📅 Upcoming Event</h2>
+            <p>Kegiatan mentoring, webinar, dan workshop yang akan datang</p>
+        </div>
+        <div class="events-grid" id="eventContainer">
+            <p style="text-align:center;color:var(--ak-gray-400);grid-column:1/-1;">Memuat event...</p>
+        </div>
+    </div>
+</section>
+
+<!-- ====== PROJECT ON GOING ====== -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2>🚀 Project On Going</h2>
+            <p>Proyek kolaborasi yang sedang berjalan</p>
+        </div>
+        <div class="projects-grid" id="projectContainer">
+            <p style="text-align:center;color:var(--ak-gray-400);grid-column:1/-1;">Memuat proyek...</p>
+        </div>
+    </div>
+</section>
+
+<!-- ====== FASILITAS ====== -->
+<section class="section" id="fasilitas">
+    <div class="container">
+        <div class="section-header">
+            <h2>🎁 Fasilitas untuk Kamu</h2>
+            <p>Panduan dan fasilitas yang tersedia untuk anggota komunitas</p>
+        </div>
+        <div class="facility-grid stagger">
+            <div class="facility-card">
+                <div class="facility-icon">📋</div>
+                <h3>Tata Cara Pengisian Aktivitas</h3>
+                <p>Panduan pengisian aktivitas di Student Portal IPB University</p>
+                <a href="https://ipb.link/tatacarapengisianaktivitas-studentportal" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-external-link-alt"></i> Lihat Panduan
+                </a>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">🏅</div>
+                <h3>Panduan Fasilitasi Lomba</h3>
+                <p>Informasi lengkap fasilitasi lomba yang ada di IPB</p>
+                <a href="https://www.instagram.com/p/DUSPEpjD2L1/?img_index=1" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="fa-brands fa-instagram"></i> Buka di Instagram
+                </a>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">💰</div>
+                <h3>Panduan Insentif Lomba Mandiri</h3>
+                <p>Cara mendapatkan insentif untuk lomba yang diikuti secara mandiri</p>
+                <a href="https://www.instagram.com/p/DUK1P6qj_Ne/?img_index=1" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="fa-brands fa-instagram"></i> Buka di Instagram
+                </a>
+            </div>
+            <div class="facility-card">
+                <div class="facility-icon">📄</div>
+                <h3>Panduan SKPI Kemahasiswaan</h3>
+                <p>Panduan Surat Keterangan Pendamping Ijazah bidang Kemahasiswaan</p>
+                <a href="https://ipb.link/panduan-skpi-kemahasiswaan" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-external-link-alt"></i> Lihat Panduan
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== ABOUT ====== -->
+<section class="section section-alt" id="about">
+    <div class="container">
+        <div class="section-header">
+            <h2>🌟 Tentang Aksara Karya 62</h2>
+            <p>Komunitas Prestasi IPB University — Kabinet Rona</p>
+        </div>
+        <div style="max-width:720px;margin:0 auto;text-align:center;">
+            <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;">
+                <div class="card" style="flex:1;min-width:200px;padding:24px;text-align:center;">
+                    <h3 style="font-family:var(--font-display);font-size:18px;color:var(--ak-purple);margin-bottom:8px;">Visi</h3>
+                    <p style="font-size:14px;color:var(--ak-gray-600);">Menjadi komunitas yang menginspirasi dan memfasilitasi mahasiswa IPB University untuk berprestasi di tingkat nasional dan internasional.</p>
+                </div>
+                <div class="card" style="flex:1;min-width:200px;padding:24px;text-align:center;">
+                    <h3 style="font-family:var(--font-display);font-size:18px;color:var(--ak-purple);margin-bottom:8px;">Misi</h3>
+                    <p style="font-size:14px;color:var(--ak-gray-600);">Mengembangkan potensi anggota melalui mentoring, pelatihan, dan kolaborasi lintas bidang untuk mencapai keunggulan.</p>
+                </div>
+            </div>
+            <h3 style="font-family:var(--font-display);font-size:20px;margin-bottom:16px;">Divisi Fungsional</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+                <div class="card" style="padding:20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">👑</div>
+                    <div style="font-weight:700;font-size:14px;">BPH</div>
+                    <div style="font-size:12px;color:var(--ak-gray-500);">Badan Pengurus Harian</div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">🎯</div>
+                    <div style="font-weight:700;font-size:14px;">CDA</div>
+                    <div style="font-size:12px;color:var(--ak-gray-500);">Cluster Development</div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">🎨</div>
+                    <div style="font-weight:700;font-size:14px;">MBD</div>
+                    <div style="font-size:12px;color:var(--ak-gray-500);">Media & Branding</div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">⚙️</div>
+                    <div style="font-weight:700;font-size:14px;">HEG</div>
+                    <div style="font-size:12px;color:var(--ak-gray-500);">Human & Event</div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">🤝</div>
+                    <div style="font-weight:700;font-size:14px;">Korvoks</div>
+                    <div style="font-size:12px;color:var(--ak-gray-500);">Koordinator Vokasi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== FAQ ====== -->
+<section class="section" id="faq">
+    <div class="container" style="max-width:720px;">
+        <div class="section-header">
+            <h2>❓ FAQ</h2>
+            <p>Pertanyaan yang sering ditanyakan</p>
+        </div>
+        <div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <span>Apa itu Aksara Karya 62?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </div>
+                <div class="faq-a">Aksara Karya 62 adalah Komunitas Prestasi di bawah IPB University yang berfokus pada pengembangan prestasi mahasiswa di 4 cluster: Bisnis, Desain, Penulisan, dan Olimpiade.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <span>Bagaimana cara bergabung?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </div>
+                <div class="faq-a">Kamu bisa bergabung melalui open recruitment yang diadakan setiap awal semester. Follow Instagram kami untuk info terbaru.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <span>Apa keuntungan jadi anggota?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </div>
+                <div class="faq-a">Anggota mendapatkan akses ke mentoring, pelatihan, info lomba, fasilitas lomba, networking, dan sertifikat keikutsertaan.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <span>Apa itu sistem poin?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </div>
+                <div class="faq-a">Setiap prestasi yang diupload akan mendapatkan poin berdasarkan tingkat dan peringkat lomba. Poin ini akan masuk ke leaderboard dan menentukan ranking anggota.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <span>Apakah ada biaya keanggotaan?</span>
+                    <i class="fa-solid fa-chevron-down faq-arrow"></i>
+                </div>
+                <div class="faq-a">Tidak ada biaya keanggotaan. Komunitas ini sepenuhnya gratis untuk seluruh mahasiswa IPB University yang terdaftar.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <h3>Aksara Karya 62</h3>
+                <p>Komunitas Prestasi IPB University</p>
+            </div>
+            <div class="footer-socials">
+                <a href="https://instagram.com/komprestasi" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://wa.me/6281234567890" target="_blank" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="mailto:komprestasi@apps.ipb.ac.id" title="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 Aksara Karya 62 — IPB University. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+    // Navbar scroll
+    window.addEventListener("scroll", () => {
+        document.getElementById("navbar").classList.toggle("scrolled", window.scrollY > 50);
+    });
+
+    // FAQ toggle
+    function toggleFaq(el) {
+        el.parentElement.classList.toggle("open");
+    }
+
+    // ====== LOAD DATA ======
+    async function init() {
+        await Promise.all([
+            loadStories(),
+            loadStats(),
+            loadLeaderboard(),
+            loadEvents(),
+            loadProjects()
+        ]);
+    }
+
+    async function loadStories() {
+        try {
+            const { data } = await db.from('prestasi').select('*').order('created_at', { ascending: false }).limit(10);
+            const container = document.getElementById('storyContainer');
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(item => `
+                    <div class="story-card">
+                        <img src="${item.foto_url || 'https://placehold.co/400x200/6d28d9/white?text=AK62'}" alt="${item.title}" loading="lazy">
+                        <div class="story-info">
+                            <h3>${item.title || 'Prestasi'}</h3>
+                            <p>${item.email_user || ''} — ${item.cluster || ''}</p>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('stat-achievements').textContent = data.length;
+            } else {
+                container.innerHTML = '<p style="color:var(--ak-gray-400);padding:32px;text-align:center;">Belum ada cerita prestasi.</p>';
+            }
+        } catch(e) { console.log("Stories:", e); }
+    }
+
+    async function loadStats() {
+        try {
+            const { data } = await db.from('prestasi').select('cluster');
+            if (!data) return;
+            const stats = { Olimpiade: 0, Bisnis: 0, Penulisan: 0, Desain: 0 };
+            data.forEach(item => { if (stats.hasOwnProperty(item.cluster)) stats[item.cluster]++; });
+            document.getElementById('countOlimpiade').textContent = stats.Olimpiade;
+            document.getElementById('countBisnis').textContent = stats.Bisnis;
+            document.getElementById('countPenulisan').textContent = stats.Penulisan;
+            document.getElementById('countDesain').textContent = stats.Desain;
+            document.getElementById('countTotal').textContent = data.length;
+        } catch(e) { console.log("Stats:", e); }
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const { data } = await db.from('profiles').select('*').order('points', { ascending: false }).limit(5);
+            const tbody = document.getElementById('leaderboardBody');
+            if (data && data.length > 0) {
+                const rankClass = ['gold','silver','bronze','',''];
+                tbody.innerHTML = data.map((m, i) => `
+                    <tr>
+                        <td><span class="lb-rank ${rankClass[i]}">#${i+1}</span></td>
+                        <td class="lb-name">${m.name || m.full_name || m.email}</td>
+                        <td>${getClusterBadge(m.cluster || '-')}</td>
+                        <td style="text-align:right;" class="lb-points">${m.points || 0} pts</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--ak-gray-400);">Belum ada data leaderboard.</td></tr>';
+            }
+        } catch(e) { console.log("Leaderboard:", e); }
+    }
+
+    async function loadEvents() {
+        try {
+            const { data } = await db.from('events').select('*');
+            const container = document.getElementById('eventContainer');
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(ev => `
+                    <div class="event-card">
+                        <img src="${ev.image_url || 'https://placehold.co/400x300/6d28d9/white?text=Event'}" alt="${ev.title}" loading="lazy">
+                        <div class="event-info">
+                            <h3>${ev.title}</h3>
+                            <p>${ev.description || ''}</p>
+                            <a href="${ev.registration_link || '#'}" target="_blank" class="btn btn-primary btn-sm btn-block">
+                                <i class="fa-solid fa-arrow-right"></i> Daftar Sekarang
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="text-align:center;color:var(--ak-gray-400);grid-column:1/-1;">Belum ada event terdekat.</p>';
+            }
+        } catch(e) { console.log("Events:", e); }
+    }
+
+    async function loadProjects() {
+        try {
+            const { data } = await db.from('projects').select('*');
+            const container = document.getElementById('projectContainer');
+            if (data && data.length > 0) {
+                document.getElementById('stat-projects').textContent = data.length;
+                container.innerHTML = data.map(p => {
+                    const pct = p.total_milestones ? Math.round((p.completed_milestones / p.total_milestones) * 100) : 0;
+                    return `
+                        <div class="project-card">
+                            <span class="badge badge-purple">${p.leader_name || 'Leader'}</span>
+                            <h3>${p.title}</h3>
+                            <p style="font-size:13px;color:var(--ak-gray-500);">${p.description || ''}</p>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill" style="width:${pct}%;"></div>
+                            </div>
+                            <p style="font-size:12px;color:var(--ak-gray-500);margin-top:8px;">Progress <b>${pct}%</b></p>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = '<p style="text-align:center;color:var(--ak-gray-400);grid-column:1/-1;">Belum ada proyek on-going.</p>';
+            }
+        } catch(e) { console.log("Projects:", e); }
+    }
+
+    init();
+</script>
+
+</body>
+</html>
