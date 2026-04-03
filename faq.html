@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — Aksara Karya</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--c-border)}
+        .nav-inner{max-width:1120px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+        .nav-logo img{height:40px}
+        .nav-links{display:flex;align-items:center;gap:4px}
+        .nav-links a{padding:8px 14px;font-size:14px;font-weight:500;color:var(--c-text-secondary);border-radius:var(--radius);transition:all .15s}
+        .nav-links a:hover{color:var(--c-text);background:var(--c-bg)}
+        .nav-links a.active{color:var(--c-text);font-weight:600}
+        .page-header{padding:80px 0 48px;text-align:center;background:#fff;border-bottom:1px solid var(--c-border)}
+        .page-header h1{font-family:var(--font-serif);font-size:36px;margin-bottom:8px}
+        .page-header p{color:var(--c-text-muted);font-size:15px}
+        .content{padding:56px 0}
+        .faq-item{border:1px solid var(--c-border);border-radius:var(--radius);margin-bottom:8px;background:#fff;overflow:hidden}
+        .faq-q{padding:16px 20px;cursor:pointer;font-weight:500;font-size:15px;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+        .faq-q:hover{background:var(--c-bg)}
+        .faq-a{max-height:0;overflow:hidden;transition:max-height .3s;padding:0 20px;color:var(--c-text-secondary);font-size:14px;line-height:1.7}
+        .faq-item.open .faq-a{max-height:200px;padding:0 20px 16px}
+        .faq-item.open .arrow{transform:rotate(180deg)}
+        .arrow{transition:transform .2s;color:var(--c-text-muted);font-size:12px}
+        .chat-box{border:1px solid var(--c-border);border-radius:var(--radius-lg);background:#fff;overflow:hidden;margin-top:40px}
+        .chat-header{padding:16px 20px;border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px}
+        .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+        .chat-messages{padding:20px;min-height:200px;max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+        .chat-input{padding:12px 20px;border-top:1px solid var(--c-border);display:flex;gap:8px}
+        .msg-bot{display:flex;gap:10px}
+        .msg-bot .bubble{background:var(--c-bg);padding:10px 14px;border-radius:2px var(--radius) var(--radius) var(--radius);font-size:14px;color:var(--c-text);max-width:80%;line-height:1.6}
+        .msg-user{display:flex;gap:10px;justify-content:flex-end}
+        .msg-user .bubble{background:var(--c-primary);color:#fff;padding:10px 14px;border-radius:var(--radius) 2px var(--radius) var(--radius);font-size:14px;max-width:80%}
+        .chat-mini-avatar{min-width:28px;height:28px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+        @media(max-width:768px){.nav-links{display:none}}
+    </style>
+</head>
+<body>
+<header class="nav"><div class="nav-inner"><a href="index.html" class="nav-logo"><img src="images/logo.png" alt="Aksara Karya"></a><nav class="nav-links"><a href="index.html">Home</a><a href="about.html">About</a><a href="fasilitas.html">Fasilitas</a><a href="faq.html" class="active">FAQ</a><a href="login.html" class="btn btn-primary btn-sm">Masuk</a></nav></div></header>
+
+<section class="page-header"><div class="container"><h1>FAQ</h1><p>Pertanyaan umum dan asisten AI komunitas</p></div></section>
+
+<section class="content"><div class="container" style="max-width:680px">
+
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Apa itu Aksara Karya?</span><i class="fa-solid fa-chevron-down arrow"></i></div><div class="faq-a">Aksara Karya adalah Komunitas Prestasi di bawah IPB University yang berfokus pada pengembangan prestasi mahasiswa di 4 cluster: Bisnis, Desain, Penulisan, dan Olimpiade.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Bagaimana cara bergabung?</span><i class="fa-solid fa-chevron-down arrow"></i></div><div class="faq-a">Melalui open recruitment yang diadakan setiap awal semester. Ikuti informasi di Instagram @komprestasi.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Apa keuntungan menjadi anggota?</span><i class="fa-solid fa-chevron-down arrow"></i></div><div class="faq-a">Akses ke mentoring, pelatihan, informasi lomba, fasilitas lomba, networking, dan sertifikat keikutsertaan.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Bagaimana sistem poin bekerja?</span><i class="fa-solid fa-chevron-down arrow"></i></div><div class="faq-a">Setiap prestasi yang di-upload mendapat poin berdasarkan tingkat lomba dan peringkat. Poin menentukan posisi di leaderboard.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Apakah ada biaya keanggotaan?</span><i class="fa-solid fa-chevron-down arrow"></i></div><div class="faq-a">Tidak. Komunitas ini sepenuhnya gratis untuk seluruh mahasiswa IPB University.</div></div>
+
+    <!-- AI CHATBOT -->
+    <div class="chat-box">
+        <div class="chat-header">
+            <div class="chat-avatar">AK</div>
+            <div><div style="font-weight:600;font-size:14px">AK-Bot</div><div style="font-size:12px;color:var(--c-text-muted)">Asisten AI Aksara Karya &middot; Powered by Gemini</div></div>
+        </div>
+        <div class="chat-messages" id="chatMsgs">
+            <div class="msg-bot">
+                <div class="chat-mini-avatar">AK</div>
+                <div class="bubble">Hai, ada yang bisa saya bantu tentang Aksara Karya? Silakan tanya apa saja.</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input id="chatIn" class="form-input" placeholder="Tulis pertanyaan..." style="flex:1" onkeypress="if(event.key==='Enter')sendChat()">
+            <button onclick="sendChat()" class="btn btn-primary" id="chatBtn"><i class="fa-solid fa-arrow-up"></i></button>
+        </div>
+    </div>
+
+</div></section>
+
+<footer style="border-top:1px solid var(--c-border);padding:24px 0;text-align:center;margin-top:32px"><p style="font-size:12px;color:var(--c-text-muted)">&copy; 2025 Aksara Karya — IPB University</p></footer>
+
+<script>
+/*
+ * SETUP: Ganti API key di bawah ini.
+ * Dapatkan gratis di https://aistudio.google.com/app/apikey
+ */
+const GEMINI_KEY = "YOUR_GEMINI_API_KEY"; // <-- GANTI INI
+
+const SYS = `Kamu adalah AK-Bot, asisten digital Aksara Karya — Komunitas Prestasi IPB University. Jawab dalam Bahasa Indonesia yang sopan dan informatif. Jangan terlalu panjang, maksimal 3-4 kalimat.
+
+Info komunitas:
+- Kabinet: Aksara Karya (2025)
+- Motto: Grow. Inspire. Excellence.
+- 4 Cluster: Bisnis, Desain, Penulisan, Olimpiade
+- 4 Divisi: CDA, MBD, HEG, Korvoks + BPH
+- Anggota dapat mentoring, pelatihan, info lomba, fasilitas, networking
+- Gratis, tidak ada biaya keanggotaan
+- Sistem poin: prestasi di-upload → poin berdasarkan tingkat & peringkat → masuk leaderboard
+- Instagram: @komprestasi`;
+
+let hist = [];
+
+async function sendChat() {
+    const input = document.getElementById('chatIn');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+
+    const box = document.getElementById('chatMsgs');
+    box.innerHTML += `<div class="msg-user"><div class="bubble">${msg}</div></div>`;
+    box.scrollTop = box.scrollHeight;
+
+    const lid = 'ld-' + Date.now();
+    box.innerHTML += `<div class="msg-bot" id="${lid}"><div class="chat-mini-avatar">AK</div><div class="bubble"><span class="spinner" style="width:14px;height:14px"></span></div></div>`;
+    box.scrollTop = box.scrollHeight;
+
+    if (GEMINI_KEY === "YOUR_GEMINI_API_KEY") {
+        document.querySelector('#' + lid + ' .bubble').innerHTML = 'API Key belum diset. Buka <b>faq.html</b>, cari <code>GEMINI_KEY</code>, ganti dengan key dari <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--c-accent)">Google AI Studio</a>.';
+        return;
+    }
+
+    hist.push({ role: "user", parts: [{ text: msg }] });
+
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ system_instruction: { parts: [{ text: SYS }] }, contents: hist })
+        });
+        const data = await res.json();
+        let reply = "Maaf, terjadi kesalahan. Coba tanya lagi.";
+        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            reply = data.candidates[0].content.parts[0].text;
+            hist.push({ role: "model", parts: [{ text: reply }] });
+            if (hist.length > 16) hist = hist.slice(-8);
+        }
+        document.querySelector('#' + lid + ' .bubble').innerHTML = reply.replace(/\n/g, '<br>');
+    } catch (e) {
+        document.querySelector('#' + lid + ' .bubble').innerHTML = 'Gagal terhubung: ' + e.message;
+    }
+    box.scrollTop = box.scrollHeight;
+}
+</script>
+</body>
+</html>
