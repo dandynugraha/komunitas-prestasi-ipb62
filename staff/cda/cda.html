@@ -1,0 +1,219 @@
+<div class="animate-fadeInUp">
+    <div style="margin-bottom:24px;">
+        <h2 style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ak-gray-900);">🎯 CDA Panel</h2>
+        <p style="color:var(--ak-gray-500);font-size:14px;margin-top:4px;" id="cda-subtitle">Kelola anggota cluster & upload event</p>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+        <button onclick="cdaTab('members',this)" class="btn btn-primary btn-sm cda-tab active">👥 Anggota Cluster</button>
+        <button onclick="cdaTab('lomba',this)" class="btn btn-ghost btn-sm cda-tab">🚩 Tracking Lomba</button>
+        <button onclick="cdaTab('event',this)" class="btn btn-ghost btn-sm cda-tab">📅 Upload Event</button>
+        <button onclick="cdaTab('design',this)" class="btn btn-ghost btn-sm cda-tab">🎨 Pesan Design MBD</button>
+    </div>
+
+    <!-- MEMBERS TAB -->
+    <div id="cda-tab-members" class="cda-panel">
+        <div class="card">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--ak-gray-100);">
+                <h3 style="font-size:16px;font-weight:700;">Daftar Anggota</h3>
+            </div>
+            <div style="padding:0 24px;">
+                <table class="table">
+                    <thead><tr><th>Nama</th><th>Email</th><th>Cluster</th><th>Poin</th></tr></thead>
+                    <tbody id="cda-member-list">
+                        <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ak-gray-400);">Memuat...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOMBA TAB -->
+    <div id="cda-tab-lomba" class="cda-panel" style="display:none;">
+        <div class="card">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--ak-gray-100);">
+                <h3 style="font-size:16px;font-weight:700;">Tracking Lomba di Cluster</h3>
+            </div>
+            <div style="padding:0 24px;">
+                <table class="table">
+                    <thead><tr><th>Nama</th><th>Lomba</th><th>Status</th><th>Tanggal</th></tr></thead>
+                    <tbody id="cda-lomba-list">
+                        <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ak-gray-400);">Memuat...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- EVENT UPLOAD TAB -->
+    <div id="cda-tab-event" class="cda-panel" style="display:none;">
+        <div class="card" style="padding:28px;max-width:600px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Upload Event / Mentoring</h3>
+            <div class="form-group">
+                <label class="form-label">Judul Event</label>
+                <input id="cda-ev-title" class="form-input" placeholder="Nama event mentoring">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea id="cda-ev-desc" class="form-textarea" placeholder="Penjelasan event..."></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group">
+                    <label class="form-label">Tanggal & Waktu</label>
+                    <input id="cda-ev-date" type="datetime-local" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Visibilitas</label>
+                    <select id="cda-ev-visibility" class="form-select">
+                        <option value="cluster">Hanya Cluster Saya</option>
+                        <option value="public">Semua (Public)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Link Poster (URL gambar)</label>
+                <input id="cda-ev-image" class="form-input" placeholder="https://...">
+            </div>
+            <button onclick="cdaUploadEvent()" id="cda-ev-btn" class="btn btn-primary btn-block">Upload Event</button>
+        </div>
+    </div>
+
+    <!-- DESIGN ORDER TAB -->
+    <div id="cda-tab-design" class="cda-panel" style="display:none;">
+        <div class="card" style="padding:28px;max-width:600px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">🎨 Pesan Design ke MBD</h3>
+            <div class="form-group">
+                <label class="form-label">Nama Event</label>
+                <input id="cda-ds-event" class="form-input" placeholder="Nama event yang butuh design">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group">
+                    <label class="form-label">Jenis Design</label>
+                    <select id="cda-ds-type" class="form-select">
+                        <option>Ilustrasi</option><option>Desain Grafis</option><option>Video</option><option>Multimedia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Foto Mentor (Link Drive)</label>
+                    <input id="cda-ds-photo" class="form-input" placeholder="https://drive.google.com/...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Press Release / Brief</label>
+                <textarea id="cda-ds-brief" class="form-textarea" placeholder="Detail kebutuhan design..."></textarea>
+            </div>
+            <button onclick="cdaOrderDesign()" id="cda-ds-btn" class="btn btn-gold btn-block">Kirim ke MBD</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const user = getUser();
+    const role = getUserRole();
+    // Determine which cluster this CDA manages
+    let myCluster = null;
+    const match = role.match(/cda\s*\((\w+)\)/);
+    if (match) myCluster = match[1];
+
+    document.getElementById('cda-subtitle').textContent = myCluster
+        ? `PJ Cluster ${myCluster.charAt(0).toUpperCase() + myCluster.slice(1)}`
+        : 'Kelola anggota cluster & upload event';
+
+    // Load members
+    async function loadMembers() {
+        try {
+            let query = db.from('profiles').select('*');
+            if (myCluster) query = query.eq('cluster', myCluster);
+            const { data } = await query.order('name');
+            const tbody = document.getElementById('cda-member-list');
+            if (data && data.length > 0) {
+                tbody.innerHTML = data.map(m => `
+                    <tr style="cursor:pointer;" onclick="showMemberDetail('${m.email}')">
+                        <td><b>${m.name || m.full_name || '-'}</b></td>
+                        <td style="font-size:13px;color:var(--ak-gray-500);">${m.email}</td>
+                        <td>${getClusterBadge(m.cluster || '-')}</td>
+                        <td style="font-family:var(--font-display);font-weight:700;color:var(--ak-gold);">${m.points || 0}</td>
+                    </tr>
+                `).join('');
+            }
+        } catch(e) {}
+    }
+
+    async function loadLomba() {
+        try {
+            let query = db.from('lomba_tracking').select('*');
+            if (myCluster) query = query.eq('bidang', myCluster.charAt(0).toUpperCase() + myCluster.slice(1));
+            const { data } = await query.order('created_at', { ascending: false });
+            const tbody = document.getElementById('cda-lomba-list');
+            if (data && data.length > 0) {
+                tbody.innerHTML = data.map(l => `
+                    <tr>
+                        <td><b>${l.member_name || l.email}</b></td>
+                        <td>${l.nama_lomba}<br><span style="font-size:11px;color:var(--ak-gray-400);">${l.penyelenggara || ''}</span></td>
+                        <td><span class="badge badge-purple">${l.status}</span></td>
+                        <td style="font-size:13px;">${formatDate(l.tanggal_daftar)}</td>
+                    </tr>
+                `).join('');
+            }
+        } catch(e) {}
+    }
+
+    loadMembers();
+    loadLomba();
+
+    // Tab switching
+    window.cdaTab = function(tab, btn) {
+        document.querySelectorAll('.cda-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('cda-tab-' + tab).style.display = 'block';
+        document.querySelectorAll('.cda-tab').forEach(b => { b.className = 'btn btn-ghost btn-sm cda-tab'; });
+        btn.className = 'btn btn-primary btn-sm cda-tab active';
+    };
+
+    window.cdaUploadEvent = async function() {
+        const title = document.getElementById('cda-ev-title').value.trim();
+        if (!title) return showToast("Isi judul event!", "warning");
+        setLoading("cda-ev-btn", true);
+        try {
+            await db.from('events').insert([{
+                title, description: document.getElementById('cda-ev-desc').value,
+                image_url: document.getElementById('cda-ev-image').value,
+                visibility: document.getElementById('cda-ev-visibility').value,
+                cluster: myCluster || 'all', created_by: user.email
+            }]);
+            showToast("Event berhasil diupload!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("cda-ev-btn", false); }
+    };
+
+    window.cdaOrderDesign = async function() {
+        const eventName = document.getElementById('cda-ds-event').value.trim();
+        if (!eventName) return showToast("Isi nama event!", "warning");
+        setLoading("cda-ds-btn", true);
+        try {
+            await db.from('design_orders').insert([{
+                event_name: eventName,
+                design_type: document.getElementById('cda-ds-type').value,
+                photo_link: document.getElementById('cda-ds-photo').value,
+                brief: document.getElementById('cda-ds-brief').value,
+                ordered_by: user.email, status: 'pending'
+            }]);
+            showToast("Order design terkirim ke MBD!", "success");
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+        finally { setLoading("cda-ds-btn", false); }
+    };
+
+    window.showMemberDetail = async function(email) {
+        // Show member detail in a modal-like view
+        try {
+            const [{ data: prestasi }, { data: lomba }] = await Promise.all([
+                db.from('prestasi').select('*').eq('email_user', email),
+                db.from('lomba_tracking').select('*').eq('email', email)
+            ]);
+            let content = `<b>Prestasi:</b> ${prestasi?.length || 0} | <b>Lomba:</b> ${lomba?.length || 0}`;
+            showModal(`Detail: ${email}`, content, null);
+        } catch(e) {}
+    };
+})();
+</script>
