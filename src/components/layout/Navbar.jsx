@@ -3,174 +3,151 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, LogOut, LayoutDashboard, Settings } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { signOut } from '../../services/supabase'
+import { Logo } from '../ui/index'
+import { getCL } from '../../utils/constants'
 import toast from 'react-hot-toast'
 
-const navLinks = [
-  { to: '/', label: 'Beranda' },
-  { to: '/competitions', label: 'Kompetisi' },
-  { to: '/events', label: 'Event' },
-  { to: '/facilities', label: 'Fasilitas' },
-  { to: '/about', label: 'Tentang Kami' },
-  { to: '/faq', label: 'FAQ & AI' },
+const NAV = [
+  { to:'/',             label:'Beranda' },
+  { to:'/competitions', label:'Lomba' },
+  { to:'/events',       label:'Event' },
+  { to:'/facilities',   label:'Fasilitas' },
+  { to:'/about',        label:'Tentang Kami' },
+  { to:'/faq',          label:'FAQ' },
 ]
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const { user, profile } = useAuth()
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [mob, setMob]       = useState(false)
+  const [umenu, setUmenu]   = useState(false)
+  const [scrolled, setScr]  = useState(false)
+  const { user, profile }   = useAuth()
+  const loc                 = useLocation()
+  const nav                 = useNavigate()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    const fn = () => setScr(window.scrollY > 10)
+    fn(); window.addEventListener('scroll', fn)
+    return () => window.removeEventListener('scroll', fn)
   }, [])
+  useEffect(() => { setMob(false); setUmenu(false) }, [loc.pathname])
 
-  useEffect(() => { setOpen(false) }, [location.pathname])
-
-  const handleSignOut = async () => {
-    await signOut()
-    toast.success('Berhasil keluar')
-    navigate('/')
-  }
-
-  const getDashboardLink = () => {
-    const role = profile?.role || ''
-    if (role === 'mbd (web developer)' || role === 'bph') return '/admin'
-    if (['heg','cda','cda (bisnis)','cda (desain)','cda (penulisan)','cda (olimpiade)','mbd','mbd (ilustrator)','mbd (desain grafis)','mbd (video editor)','mbd (multimedia)','korvoks'].includes(role)) return '/staff'
+  const out = async () => { await signOut(); toast.success('Berhasil keluar'); nav('/') }
+  const isA = (to) => loc.pathname === to
+  const dash = () => {
+    const r = profile?.role || ''
+    if (r === 'mbd (web developer)' || r === 'bph') return '/admin'
+    if (['heg','cda','mbd','korvoks'].some(d => r.includes(d))) return '/staff'
     return '/dashboard'
   }
+  const cl = getCL(profile?.cluster)
 
   return (
     <header style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      background: scrolled ? 'rgba(255,255,255,0.95)' : 'white',
-      backdropFilter: scrolled ? 'blur(12px)' : 'none',
-      borderBottom: `1px solid ${scrolled ? '#E8E6E0' : 'transparent'}`,
-      transition: 'all 0.3s ease',
+      position:'fixed', top:0, left:0, right:0, zIndex:200, height:64,
+      background: scrolled ? 'rgba(255,255,255,0.97)' : '#fff',
+      borderBottom:'1px solid var(--bdr)',
+      boxShadow: scrolled ? 'var(--s1)' : 'none',
+      transition:'box-shadow 0.2s',
     }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', height: 68, gap: '2rem' }}>
+      <div className="wrap" style={{ display:'flex', alignItems:'center', height:'100%', gap:8 }}>
+
         {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <img src="/logo.png" alt="Aksara Karya 62" style={{ height: 40, width: 'auto' }} />
+        <Link to="/" style={{ lineHeight:0, flexShrink:0 }}>
+          <Logo h={36}/>
         </Link>
 
-        {/* Desktop nav */}
-        <nav style={{ display: 'flex', gap: '0.25rem', flex: 1, justifyContent: 'center' }}
-          className="desktop-nav">
-          {navLinks.map(({ to, label }) => (
-            <Link
-              key={to} to={to}
-              style={{
-                padding: '6px 14px', borderRadius: 8, fontSize: '0.875rem', fontWeight: 500,
-                color: location.pathname === to ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                background: location.pathname === to ? 'var(--color-primary-pale)' : 'transparent',
-                transition: 'var(--transition)',
-              }}
-            >{label}</Link>
-          ))}
-        </nav>
+        {/* Spacer */}
+        <div style={{ flex:1 }}/>
 
-        {/* Right actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: 'auto' }}>
+        {/* Desktop nav — right side */}
+        <nav style={{ display:'flex', alignItems:'center', gap:2 }} className="dnav">
+          {NAV.map(({ to, label }) => (
+            <Link key={to} to={to} style={{
+              padding:'5px 11px', borderRadius:6, fontSize:'0.845rem',
+              fontWeight: isA(to) ? 700 : 500,
+              color: isA(to) ? 'var(--brand)' : 'var(--t2)',
+              background: isA(to) ? 'var(--brand-lite)' : 'transparent',
+              transition:'all 0.15s', whiteSpace:'nowrap',
+            }}
+            onMouseEnter={e => { if (!isA(to)) { e.currentTarget.style.color='var(--brand)'; e.currentTarget.style.background='var(--brand-pale)' }}}
+            onMouseLeave={e => { if (!isA(to)) { e.currentTarget.style.color='var(--t2)'; e.currentTarget.style.background='transparent' }}}>
+              {label}
+            </Link>
+          ))}
+
+          <div style={{ width:1, height:16, background:'var(--bdr)', margin:'0 6px' }}/>
+
+          {/* Auth */}
           {user ? (
-            <div style={{ position: 'relative' }}>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px',
-                  borderRadius: 10, border: '1.5px solid var(--color-border)',
-                  background: 'white', cursor: 'pointer', transition: 'var(--transition)',
-                }}
-              >
-                <div className="avatar avatar-sm" style={{ background: 'var(--color-primary-pale)', color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.75rem' }}>
-                  {profile?.name?.[0] || 'A'}
+            <div style={{ position:'relative' }}>
+              <button onClick={() => setUmenu(!umenu)} style={{
+                display:'flex', alignItems:'center', gap:6, padding:'5px 8px',
+                borderRadius:8, border:'1px solid var(--bdr)', background:'#fff',
+                cursor:'pointer', transition:'all 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor='var(--bdr2)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor='var(--bdr)'}>
+                <div className="av av-s" style={{ background:cl.bg, color:cl.color }}>
+                  {profile?.name?.[0]?.toUpperCase() || 'A'}
                 </div>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize:'0.82rem', fontWeight:600, color:'var(--t1)', maxWidth:80, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                   {profile?.name?.split(' ')[0] || 'User'}
                 </span>
-                <ChevronDown size={14} style={{ color: 'var(--color-text-muted)' }} />
+                <ChevronDown size={12} color="var(--t4)" style={{ transform: umenu?'rotate(180deg)':'none', transition:'transform 0.15s', flexShrink:0 }}/>
               </button>
-
-              {userMenuOpen && (
-                <div style={{
-                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-                  background: 'white', border: '1px solid var(--color-border)',
-                  borderRadius: 14, boxShadow: 'var(--shadow-lg)', width: 200, overflow: 'hidden',
-                  animation: 'fadeIn 0.15s ease',
-                }}>
-                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border)' }}>
-                    <p style={{ fontWeight: 600, fontSize: '0.875rem' }}>{profile?.name}</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>{profile?.role || 'Member'}</p>
+              {umenu && (
+                <div style={{ position:'absolute', top:'calc(100% + 6px)', right:0, background:'#fff', border:'1px solid var(--bdr)', borderRadius:12, boxShadow:'var(--s3)', width:188, overflow:'hidden', animation:'up 0.15s var(--ease)' }}>
+                  <div style={{ padding:'10px 13px', background:'var(--brand-pale)', borderBottom:'1px solid var(--bdr)' }}>
+                    <p style={{ fontWeight:700, fontSize:'0.82rem' }}>{profile?.name}</p>
+                    <p style={{ fontSize:'0.69rem', color:'var(--t3)', textTransform:'capitalize', marginTop:1 }}>{profile?.role||'Member'}</p>
                   </div>
-                  <Link to={getDashboardLink()} onClick={() => setUserMenuOpen(false)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: '0.875rem', transition: 'var(--transition)' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--color-surface-2)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <LayoutDashboard size={15} /> Dashboard
-                  </Link>
-                  {(profile?.role === 'mbd (web developer)' || profile?.role === 'bph') && (
-                    <Link to="/admin" onClick={() => setUserMenuOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: '0.875rem', transition: 'var(--transition)' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--color-surface-2)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                      <Settings size={15} /> Kelola Konten
+                  {[
+                    { to:dash(), label:'Dashboard', I:LayoutDashboard },
+                    ...((profile?.role==='mbd (web developer)'||profile?.role==='bph') ? [{ to:'/admin', label:'Kelola Konten', I:Settings }] : []),
+                  ].map(({ to, label, I }) => (
+                    <Link key={to} to={to} style={{ display:'flex', alignItems:'center', gap:8, padding:'9px 13px', fontSize:'0.82rem', color:'var(--t1)', transition:'background 0.12s' }}
+                      onMouseEnter={e=>e.currentTarget.style.background='var(--brand-pale)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                      <I size={13} color="var(--brand)"/> {label}
                     </Link>
-                  )}
-                  <button onClick={handleSignOut}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', fontSize: '0.875rem', width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--color-danger)', transition: 'var(--transition)' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <LogOut size={15} /> Keluar
+                  ))}
+                  <button onClick={out} style={{ display:'flex', alignItems:'center', gap:8, padding:'9px 13px', fontSize:'0.82rem', color:'#DC2626', width:'100%', border:'none', background:'transparent', cursor:'pointer', borderTop:'1px solid var(--bdr)', fontFamily:'var(--font)', transition:'background 0.12s' }}
+                    onMouseEnter={e=>e.currentTarget.style.background='#FEF2F2'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <LogOut size={13}/> Keluar
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <Link to="/login" className="btn btn-primary btn-sm">Masuk</Link>
+            <Link to="/login" className="btn btn-brand btn-sm">Login</Link>
           )}
+        </nav>
 
-          {/* Mobile toggle */}
-          <button onClick={() => setOpen(!open)} className="btn btn-ghost btn-sm mobile-menu-btn"
-            style={{ padding: 8 }}>
-            {open ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+        {/* Mobile toggle */}
+        <button onClick={()=>setMob(!mob)} className="mbtn" style={{ display:'none', background:'none', border:'none', padding:6, color:'var(--t1)', cursor:'pointer', borderRadius:6 }}>
+          {mob ? <X size={21}/> : <Menu size={21}/>}
+        </button>
       </div>
 
       {/* Mobile menu */}
-      {open && (
-        <div style={{
-          background: 'white', borderTop: '1px solid var(--color-border)',
-          padding: '1rem', display: 'flex', flexDirection: 'column', gap: 4,
-          animation: 'fadeIn 0.2s ease',
-        }}>
-          {navLinks.map(({ to, label }) => (
-            <Link key={to} to={to} style={{
-              padding: '10px 14px', borderRadius: 10,
-              fontWeight: 500, fontSize: '0.9rem',
-              color: location.pathname === to ? 'var(--color-primary)' : 'var(--color-text)',
-              background: location.pathname === to ? 'var(--color-primary-pale)' : 'transparent',
-            }}>{label}</Link>
+      {mob && (
+        <nav style={{ background:'#fff', borderTop:'1px solid var(--bdr)', padding:'0.75rem', display:'flex', flexDirection:'column', gap:2 }}>
+          {NAV.map(({ to, label }) => (
+            <Link key={to} to={to} style={{ padding:'9px 11px', borderRadius:8, fontSize:'0.9rem', fontWeight:500, color:isA(to)?'var(--brand)':'var(--t1)', background:isA(to)?'var(--brand-pale)':'transparent' }}>{label}</Link>
           ))}
-          {user && (
-            <>
-              <Link to={getDashboardLink()} style={{ padding: '10px 14px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-primary)' }}>
-                Dashboard
-              </Link>
-              <button onClick={handleSignOut} style={{ padding: '10px 14px', textAlign: 'left', border: 'none', background: 'transparent', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-danger)', cursor: 'pointer' }}>
-                Keluar
-              </button>
-            </>
-          )}
-        </div>
+          <hr style={{ border:'none', borderTop:'1px solid var(--bdr)', margin:'3px 0' }}/>
+          {user
+            ? <><Link to={dash()} style={{ padding:'9px 11px', fontWeight:700, color:'var(--brand)', fontSize:'0.9rem' }}>Dashboard</Link>
+                <button onClick={out} style={{ padding:'9px 11px', textAlign:'left', border:'none', background:'transparent', color:'#DC2626', fontWeight:700, fontSize:'0.9rem', cursor:'pointer', fontFamily:'var(--font)', borderRadius:8 }}>Keluar</button></>
+            : <Link to="/login" style={{ padding:'9px 11px', fontWeight:700, color:'var(--brand)', fontSize:'0.9rem' }}>Login</Link>
+          }
+        </nav>
       )}
 
       <style>{`
-        @media (min-width: 769px) { .mobile-menu-btn { display: none !important; } }
-        @media (max-width: 768px) { .desktop-nav { display: none !important; } }
+        @media(min-width:769px){.mbtn{display:none!important}}
+        @media(max-width:768px){.dnav{display:none!important}.mbtn{display:flex!important}}
       `}</style>
     </header>
   )

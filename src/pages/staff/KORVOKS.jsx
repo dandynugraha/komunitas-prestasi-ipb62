@@ -1,1 +1,1 @@
-export { KORVOKSDashboard as default } from './StaffPages'
+export { KORVOKSDashboard as default } from './Dashboard'

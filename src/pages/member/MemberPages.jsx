@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../components/layout/DashboardLayout'
-import { SIDEBAR } from './Dashboard'
+import { MNAV } from './Dashboard'
 import { useAuth } from '../../hooks/useAuth'
 import { createProject, supabase } from '../../services/supabase'
 import toast from 'react-hot-toast'
@@ -44,7 +44,7 @@ export function UploadProject() {
   }
 
   return (
-    <DashboardLayout sidebarLinks={SIDEBAR} title="Tambah Proyek">
+    <DashboardLayout links={MNAV} title="Tambah Proyek">
       <div style={{ maxWidth: 680 }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div className="form-group">
@@ -71,7 +71,7 @@ export function UploadProject() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
               <label className="form-label" style={{ margin: 0 }}>Timeline / Tahapan</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Progress: {progress}%</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--t3)' }}>Progress: {progress}%</span>
                 <button type="button" onClick={addTimeline} className="btn btn-outline btn-sm"><Plus size={14} /> Tambah</button>
               </div>
             </div>
@@ -80,8 +80,8 @@ export function UploadProject() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {timelines.map((t, i) => (
-                <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', padding: '0.75rem', background: 'var(--color-surface-2)', borderRadius: 10 }}>
-                  <button type="button" onClick={() => setTimeline(i, 'completed', !t.completed)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.completed ? 'var(--color-primary)' : 'var(--color-text-muted)', flexShrink: 0 }}>
+                <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', padding: '0.75rem', background: 'var(--bg)', borderRadius: 10 }}>
+                  <button type="button" onClick={() => setTimeline(i, 'completed', !t.completed)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.completed ? 'var(--brand)' : 'var(--t3)', flexShrink: 0 }}>
                     {t.completed ? <CheckSquare size={20} /> : <Square size={20} />}
                   </button>
                   <input className="form-input" placeholder="Nama tahapan..." value={t.title} onChange={e => setTimeline(i, 'title', e.target.value)} style={{ flex: 1 }} />
@@ -111,7 +111,7 @@ import { getEvents, markAttendance, supabase as sb } from '../../services/supaba
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 import { Calendar } from 'lucide-react'
-import { ClusterBadge, EmptyState } from '../../components/ui/index'
+import { ClBadge, Empty } from '../../components/ui/index'
 
 export function MyEvents() {
   const { profile } = useAuth()
@@ -155,14 +155,14 @@ export function MyEvents() {
   }
 
   return (
-    <DashboardLayout sidebarLinks={SIDEBAR} title="Event Saya">
+    <DashboardLayout links={MNAV} title="Event Saya">
       <div className="tabs" style={{ marginBottom: '1.5rem', maxWidth: 480 }}>
         {[['all','Semua'],['public','Publik'],['community','Komunitas'],['cluster','Klaster']].map(([v,l]) => (
           <button key={v} className={`tab${activeTab===v?' active':''}`} onClick={() => setActiveTab(v)} style={{ fontSize: '0.8rem' }}>{l}</button>
         ))}
       </div>
       {loading ? <div className="loading-center"><div className="spinner" /></div> :
-        filteredEvents.length === 0 ? <EmptyState icon={Calendar} title="Belum ada event" description="Event akan muncul di sini setelah tersedia." /> :
+        filteredEvents.length === 0 ? <Empty icon={Calendar} title="Belum ada event" description="Event akan muncul di sini setelah tersedia." /> :
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filteredEvents.map(ev => {
             const att = attendance[ev.id]
@@ -173,10 +173,10 @@ export function MyEvents() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', gap: 8, marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                       <span className="badge badge-primary" style={{ fontSize: '0.7rem' }}>{ev.visibility}</span>
-                      {ev.cluster && <ClusterBadge cluster={ev.cluster} />}
+                      {ev.cluster && <ClBadge cluster={ev.cluster} />}
                     </div>
-                    <h3 style={{ fontSize: '0.95rem', fontFamily: 'var(--font-display)', marginBottom: '0.25rem' }}>{ev.title}</h3>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontFamily: 'var(--font)', marginBottom: '0.25rem' }}>{ev.title}</h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--t3)' }}>
                       {ev.event_date ? format(new Date(ev.event_date), 'd MMMM yyyy', { locale: localeId }) : 'TBD'}
                     </p>
                   </div>
@@ -228,7 +228,7 @@ export function MyCompetitions() {
   const STATUS_COLOR = { Peserta: '#6B7280', Semifinalis: '#457B9D', Finalis: '#D4A017', Juara: '#16A34A' }
 
   return (
-    <DashboardLayout sidebarLinks={SIDEBAR} title="Kompetisi Saya">
+    <DashboardLayout links={MNAV} title="Kompetisi Saya">
       <button onClick={() => setShowForm(!showForm)} className="btn btn-primary" style={{ marginBottom: '1.5rem' }}>
         <Plus size={16} /> Catat Kompetisi
       </button>
@@ -268,14 +268,14 @@ export function MyCompetitions() {
         </div>
       )}
       {loading ? <div className="loading-center"><div className="spinner" /></div> :
-        comps.length === 0 ? <EmptyState title="Belum ada kompetisi" description="Catat kompetisi yang kamu ikuti!" /> :
+        comps.length === 0 ? <Empty title="Belum ada kompetisi" description="Catat kompetisi yang kamu ikuti!" /> :
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {comps.map(c => (
             <div key={c.id} className="card" style={{ cursor: 'default' }}>
               <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: 700 }}>{c.title}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{c.organizer} · {c.field} · {c.date}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--t3)' }}>{c.organizer} · {c.field} · {c.date}</p>
                 </div>
                 <span className="badge" style={{ background: STATUS_COLOR[c.status] + '20', color: STATUS_COLOR[c.status] }}>{c.status}</span>
               </div>
@@ -324,12 +324,12 @@ export function MyPlan() {
   const past = plans.filter(p => new Date(p.plan_date) < new Date())
 
   return (
-    <DashboardLayout sidebarLinks={SIDEBAR} title="Rencana & Kalender">
+    <DashboardLayout links={MNAV} title="Rencana & Kalender">
       <div style={{ maxWidth: 640 }}>
         {/* Add plan form */}
         <div className="card" style={{ marginBottom: '2rem', cursor: 'default' }}>
           <div className="card-body">
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', marginBottom: '1rem' }}>Tambah Rencana</h3>
+            <h3 style={{ fontFamily: 'var(--font)', fontSize: '1rem', marginBottom: '1rem' }}>Tambah Rencana</h3>
             <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div className="grid-2" style={{ gap: '0.75rem' }}>
                 <div className="form-group">
@@ -345,7 +345,7 @@ export function MyPlan() {
                 <label className="form-label">Catatan</label>
                 <textarea className="form-textarea" rows={2} value={form.note} onChange={e => setF('note', e.target.value)} placeholder="Catatan opsional..." />
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Kalender ini bersifat privat. Kamu akan mendapat notifikasi email H-1.</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>Kalender ini bersifat privat. Kamu akan mendapat notifikasi email H-1.</p>
               <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
                 <Plus size={14} /> Tambah
               </button>
@@ -354,17 +354,17 @@ export function MyPlan() {
         </div>
 
         {/* Upcoming */}
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', marginBottom: '0.75rem' }}>Mendatang</h3>
+        <h3 style={{ fontFamily: 'var(--font)', fontSize: '1rem', marginBottom: '0.75rem' }}>Mendatang</h3>
         {loading ? <div className="loading-center"><div className="spinner" /></div> :
-          upcoming.length === 0 ? <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Tidak ada rencana mendatang.</p> :
+          upcoming.length === 0 ? <p style={{ fontSize: '0.875rem', color: 'var(--t3)', marginBottom: '1.5rem' }}>Tidak ada rencana mendatang.</p> :
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
             {upcoming.map(p => (
-              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '12px 16px', background: 'white', borderRadius: 12, border: '1px solid var(--color-border)' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)', flexShrink: 0 }} />
+              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '12px 16px', background: 'white', borderRadius: 12, border: '1px solid var(--border)' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--brand)', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: 600, fontSize: '0.875rem' }}>{p.title}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{format(new Date(p.plan_date), 'EEEE, d MMMM yyyy', { locale: localeId })}</p>
-                  {p.note && <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 2 }}>{p.note}</p>}
+                  <p style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>{format(new Date(p.plan_date), 'EEEE, d MMMM yyyy', { locale: localeId })}</p>
+                  {p.note && <p style={{ fontSize: '0.75rem', color: 'var(--t3)', marginTop: 2 }}>{p.note}</p>}
                 </div>
                 <button onClick={() => handleDelete(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626' }}>
                   <TrashIcon size={15} />
@@ -376,12 +376,12 @@ export function MyPlan() {
 
         {past.length > 0 && (
           <>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', marginBottom: '0.75rem', color: 'var(--color-text-muted)' }}>Lewat</h3>
+            <h3 style={{ fontFamily: 'var(--font)', fontSize: '1rem', marginBottom: '0.75rem', color: 'var(--t3)' }}>Lewat</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {past.map(p => (
-                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '10px 16px', background: 'var(--color-surface-2)', borderRadius: 12, opacity: 0.6 }}>
+                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '10px 16px', background: 'var(--bg)', borderRadius: 12, opacity: 0.6 }}>
                   <p style={{ flex: 1, fontSize: '0.85rem', textDecoration: 'line-through' }}>{p.title}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{format(new Date(p.plan_date), 'd MMM', { locale: localeId })}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>{format(new Date(p.plan_date), 'd MMM', { locale: localeId })}</p>
                   <button onClick={() => handleDelete(p.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626' }}>
                     <TrashIcon size={13} />
                   </button>

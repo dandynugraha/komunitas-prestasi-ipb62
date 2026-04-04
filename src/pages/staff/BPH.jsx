@@ -1,1 +1,1 @@
-export { BPHDashboard as default } from './StaffPages'
+export { BPHDashboard as default } from './Dashboard'

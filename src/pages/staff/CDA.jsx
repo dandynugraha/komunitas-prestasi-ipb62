@@ -1,1 +1,1 @@
-export { CDADashboard as default } from './StaffPages'
+export { CDADashboard as default } from './Dashboard'

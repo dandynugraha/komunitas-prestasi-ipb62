@@ -1,1 +1,1 @@
-export { FacilitiesPage as default } from './Events'
+export { FacilitiesPage as default } from './PublicPages'

@@ -1,106 +1,83 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { signIn } from '../../services/supabase'
-import { useAuth } from '../../hooks/useAuth'
-import toast from 'react-hot-toast'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Logo } from '../../components/ui/index'
+import toast from 'react-hot-toast'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [show, setShow] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-  const { profile } = useAuth()
+  const [email, setEmail]       = useState('')
+  const [pass, setPass]         = useState('')
+  const [show, setShow]         = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const navigate                = useNavigate()
 
-  const handleLogin = async (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    if (!email || !password) { toast.error('Isi semua field'); return }
+    if (!email||!pass) { toast.error('Isi email dan kode anggota'); return }
     setLoading(true)
-    const { error } = await signIn(email, password)
+    const { error } = await signIn(email, pass)
     setLoading(false)
     if (error) { toast.error('Email atau kode anggota salah'); return }
-    toast.success('Selamat datang kembali!')
+    toast.success('Selamat datang!')
     navigate('/dashboard')
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--color-bg)' }}>
-      {/* Left – branding */}
-      <div style={{
-        flex: 1, background: 'var(--color-primary)', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center', padding: '3rem',
-        display: 'none',
-      }} className="login-left">
-        <img src="/logo.png" alt="logo" style={{ width: 200, filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '2rem' }} />
-        <h1 style={{ fontFamily: 'var(--font-display)', color: 'white', fontSize: '2.5rem', textAlign: 'center', lineHeight: 1.2 }}>
-          Aksara Karya 62
-        </h1>
-        <p style={{ color: 'rgba(255,255,255,0.7)', marginTop: '1rem', textAlign: 'center', maxWidth: 320, lineHeight: 1.7 }}>
-          Platform prestasi komunitas IPB University. Catat, pantau, dan rayakan setiap pencapaian bersama.
-        </p>
-        <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {['Desain', 'Olimpiade', 'Penulisan', 'Bisnis'].map(k => (
-            <span key={k} style={{ padding: '6px 16px', borderRadius: 20, background: 'rgba(255,255,255,0.15)', color: 'white', fontSize: '0.8rem', fontWeight: 600 }}>{k}</span>
-          ))}
+    <div style={{ minHeight:'100vh', display:'flex' }}>
+      {/* Left - brand */}
+      <div style={{ flex:1, background:'var(--brand)', display:'none', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'3rem', position:'relative', overflow:'hidden' }} className="ll">
+        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.06)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:'-40px', left:'-40px', width:220, height:220, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }}/>
+        <div style={{ position:'relative', textAlign:'center' }}>
+          <Logo h={44} white style={{ margin:'0 auto 1.75rem' }}/>
+          <h2 style={{ color:'#fff', marginBottom:'0.75rem', fontSize:'clamp(1.4rem,2.5vw,1.8rem)' }}>Aksara Karya 62</h2>
+          <p style={{ color:'rgba(255,255,255,0.52)', lineHeight:1.8, maxWidth:270, fontSize:'0.875rem' }}>
+            Platform resmi pencatatan dan pemantauan prestasi komunitas IPB University.
+          </p>
+          <div style={{ display:'flex', gap:7, flexWrap:'wrap', justifyContent:'center', marginTop:'1.75rem' }}>
+            {['Bisnis & Analisis','Desain & Visual','Penulisan & Sains'].map(k=>(
+              <span key={k} style={{ padding:'4px 11px', borderRadius:99, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.18)', color:'rgba(255,255,255,0.72)', fontSize:'0.75rem', fontWeight:600 }}>{k}</span>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Right – form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', maxWidth: 560, margin: '0 auto', width: '100%' }}>
-        <div style={{ width: '100%', maxWidth: 400 }}>
-          <Link to="/" style={{ display: 'flex', marginBottom: '2.5rem' }}>
-            <img src="/logo.png" alt="logo" style={{ height: 44 }} />
-          </Link>
-          <h2 style={{ fontFamily: 'var(--font-display)', marginBottom: '0.5rem' }}>Masuk ke Akun</h2>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-            Gunakan email dan kode anggota untuk masuk
-          </p>
+      {/* Right - form */}
+      <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem', background:'var(--bg)' }}>
+        <div style={{ width:'100%', maxWidth:388 }}>
+          <Link to="/" style={{ display:'inline-block', marginBottom:'2rem', lineHeight:0 }}><Logo h={34}/></Link>
+          <h2 style={{ marginBottom:'0.3rem' }}>Masuk ke Akun</h2>
+          <p style={{ color:'var(--t3)', fontSize:'0.875rem', marginBottom:'1.75rem' }}>Gunakan email dan kode anggota untuk masuk</p>
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="email" className="form-input"
-                placeholder="email@example.com"
-                value={email} onChange={e => setEmail(e.target.value)}
-              />
+          <form onSubmit={submit} style={{ display:'flex', flexDirection:'column', gap:'0.875rem' }}>
+            <div className="fg">
+              <label className="flbl">Email</label>
+              <input type="email" className="fin" placeholder="email@example.com" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/>
             </div>
-
-            <div className="form-group">
-              <label className="form-label">Kode Anggota / Password</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={show ? 'text' : 'password'} className="form-input"
-                  placeholder="Contoh: RONA622501"
-                  value={password} onChange={e => setPassword(e.target.value)}
-                  style={{ paddingRight: 44 }}
-                />
-                <button type="button" onClick={() => setShow(!show)}
-                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
-                  {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            <div className="fg">
+              <label className="flbl">Kode Anggota / Password</label>
+              <div style={{ position:'relative' }}>
+                <input type={show?'text':'password'} className="fin" placeholder="Contoh: RONA622501" value={pass} onChange={e=>setPass(e.target.value)} style={{ paddingRight:42 }} autoComplete="current-password"/>
+                <button type="button" onClick={()=>setShow(!show)} style={{ position:'absolute', right:11, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', color:'var(--t3)', cursor:'pointer', lineHeight:0 }}>
+                  {show ? <EyeOff size={15}/> : <Eye size={15}/>}
                 </button>
               </div>
             </div>
-
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem', padding: '12px' }} disabled={loading}>
-              {loading ? 'Memuat...' : <><span>Masuk</span><ArrowRight size={16} /></>}
+            <button type="submit" disabled={loading} className="btn btn-brand" style={{ width:'100%', padding:'11px', fontSize:'0.9rem', marginTop:'0.25rem', opacity:loading?0.7:1 }}>
+              {loading ? 'Memuat...' : <><span>Masuk</span><ArrowRight size={15}/></>}
             </button>
           </form>
 
-          <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--color-surface-2)', borderRadius: 12, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-            <strong style={{ color: 'var(--color-text)' }}>Tidak punya akun?</strong> Hubungi admin atau pengurus HEG untuk mendapatkan akun anggota.
+          <div style={{ marginTop:'1.25rem', padding:'0.8rem 1rem', background:'#fff', borderRadius:9, border:'1px solid var(--bdr)', fontSize:'0.78rem', color:'var(--t3)', lineHeight:1.7 }}>
+            <strong style={{ color:'var(--t1)' }}>Tidak punya akun?</strong> Hubungi admin atau pengurus HEG untuk mendapatkan akun.
           </div>
-
-          <p style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-            <Link to="/" style={{ color: 'var(--color-primary)' }}>← Kembali ke Beranda</Link>
+          <p style={{ marginTop:'1.1rem', fontSize:'0.78rem', color:'var(--t3)', textAlign:'center' }}>
+            <Link to="/" style={{ color:'var(--brand)', fontWeight:600 }}>← Kembali ke Beranda</Link>
           </p>
         </div>
       </div>
-
-      <style>{`
-        @media (min-width: 900px) { .login-left { display: flex !important; } }
-      `}</style>
+      <style>{`@media(min-width:860px){.ll{display:flex!important}}`}</style>
     </div>
   )
 }
