@@ -52,8 +52,23 @@ export default function Navbar() {
       <div className="wrap" style={{ display:'flex', alignItems:'center', height:'100%', gap:8 }}>
 
         {/* Logo */}
-        <Link to="/" style={{ lineHeight:0, flexShrink:0 }}>
-          <Logo h={36}/>
+        <Link to="/" className="flex items-center gap-3">
+          <div className="bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+            <img 
+              src={`${import.meta.env.BASE_URL}logo.png`} 
+              alt="Aksara Karya" 
+              className="h-8 md:h-10 w-auto object-contain"
+              style={{ maxWidth: '240px' }}
+            />
+          </div>
+          <div className="hidden sm:block">
+            <div className="font-serif text-lg leading-tight text-gray-900">
+              Komunitas Prestasi
+            </div>
+            <div className="text-[10px] uppercase tracking-widest text-gray-500">
+              Kabinet Aksara Karya
+            </div>
+          </div>
         </Link>
 
         {/* Spacer */}
