@@ -5,9 +5,36 @@ import { LOGO, getCL, getLV } from '../../utils/constants'
 export const Logo = ({ h = 36, white = false, style = {} }) => {
   const base = import.meta.env.BASE_URL || '/'
   const src = base.endsWith('/') ? base + 'logo.png' : base + '/logo.png'
+
+  // Kalau white=true (dipakai di background gelap), bungkus logo dengan container putih
+  // supaya logo yang background-nya putih nggak "hilang" dan tetep terbaca
+  if (white) {
+    return (
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#fff',
+        padding: '6px 12px',
+        borderRadius: 8,
+        ...style,
+      }}>
+        <img
+          src={src}
+          alt="Komunitas Prestasi - Aksara Karya"
+          style={{ height: h, width: 'auto', display: 'block' }}
+          onError={e => { e.target.src = '/logo.png' }}
+        />
+      </div>
+    )
+  }
+
+  // Default: logo tanpa filter apapun
   return (
-    <img src={src} alt="Aksara Karya 62"
-      style={{ height: h, width: 'auto', display: 'block', filter: white ? 'brightness(0) invert(1)' : 'none', ...style }}
+    <img
+      src={src}
+      alt="Komunitas Prestasi - Aksara Karya"
+      style={{ height: h, width: 'auto', display: 'block', ...style }}
       onError={e => { e.target.src = '/logo.png' }}
     />
   )

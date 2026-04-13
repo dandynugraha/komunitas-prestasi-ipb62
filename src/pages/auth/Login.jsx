@@ -31,9 +31,10 @@ export default function LoginPage() {
         <div style={{ position:'absolute', bottom:'-40px', left:'-40px', width:220, height:220, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }}/>
         <div style={{ position:'relative', textAlign:'center' }}>
           <Logo h={44} white style={{ margin:'0 auto 1.75rem' }}/>
-          <h2 style={{ color:'#fff', marginBottom:'0.75rem', fontSize:'clamp(1.4rem,2.5vw,1.8rem)' }}>Aksara Karya 62</h2>
+          <h2 style={{ color:'#fff', marginBottom:'0.4rem', fontSize:'clamp(1.4rem,2.5vw,1.8rem)' }}>Komunitas Prestasi</h2>
+          <p style={{ color:'rgba(255,255,255,0.72)', fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:'0.15em', fontWeight:600, marginBottom:'1rem' }}>Kabinet Aksara Karya</p> 
           <p style={{ color:'rgba(255,255,255,0.52)', lineHeight:1.8, maxWidth:270, fontSize:'0.875rem' }}>
-            Platform resmi pencatatan dan pemantauan prestasi komunitas IPB University.
+            Platform resmi pencatatan dan pemantauan Komunitas Prestasi IPB University.
           </p>
           <div style={{ display:'flex', gap:7, flexWrap:'wrap', justifyContent:'center', marginTop:'1.75rem' }}>
             {['Bisnis & Analisis','Desain & Visual','Penulisan & Sains'].map(k=>(

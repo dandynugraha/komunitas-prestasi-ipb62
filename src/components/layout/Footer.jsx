@@ -67,7 +67,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:'1.25rem', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:6 }}>
-          <p style={{ fontSize:'0.73rem', color:'rgba(255,255,255,0.28)' }}>© {new Date().getFullYear()} Aksara Karya 62 · Kabinet AKSARA KARYA · IPB University</p>
+          <p style={{ fontSize:'0.73rem', color:'rgba(255,255,255,0.28)' }}>© {new Date().getFullYear()} Komunitas Prestasi · Kabinet Aksara Karya · IPB University</p>
           <p style={{ fontSize:'0.73rem', color:'rgba(255,255,255,0.28)' }}>Direktorat Kemahasiswaan IPB University</p>
         </div>
       </div>
