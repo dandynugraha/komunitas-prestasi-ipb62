@@ -52,16 +52,8 @@ export default function Navbar() {
       <div className="wrap" style={{ display:'flex', alignItems:'center', height:'100%', gap:12 }}>
 
         {/* LOGO - Fixed */}
-        <Link to="/" style={{ display:'flex', alignItems:'center', gap:12, textDecoration:'none', flexShrink:0 }}>
-          <Logo h={36}/>
-          <div className="brand-text" style={{ lineHeight:1.15, borderLeft:'1px solid var(--bdr)', paddingLeft:12 }}>
-            <div style={{ fontSize:'0.92rem', fontWeight:700, color:'var(--t1)', whiteSpace:'nowrap' }}>
-              Komunitas Prestasi
-            </div>
-            <div style={{ fontSize:'0.64rem', textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--t3)', fontWeight:600, whiteSpace:'nowrap', marginTop:2 }}>
-              Kabinet Aksara Karya
-            </div>
-          </div>
+        <Link to="/" style={{ display:'flex', alignItems:'center', textDecoration:'none', flexShrink:0 }}>
+        <Logo h={40}/>
         </Link>
 
         {/* Spacer */}
