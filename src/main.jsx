@@ -6,9 +6,18 @@ import App from './App'
 import { AuthProvider } from './hooks/useAuth'
 import './styles/global.css'
 
+// Handle redirect dari 404.html untuk SPA routing di GitHub Pages
+(function() {
+  const redirect = sessionStorage.redirect;
+  delete sessionStorage.redirect;
+  if (redirect && redirect !== location.pathname + location.search + location.hash) {
+    history.replaceState(null, null, redirect);
+  }
+})();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
         <App />
         <Toaster

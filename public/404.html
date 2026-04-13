@@ -2,19 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Aksara Karya</title>
+  <title>Redirecting...</title>
   <script>
-    // Single Page Apps for GitHub Pages - https://github.com/rafgraph/spa-github-pages
-    var pathSegmentsToKeep = 1; // 1 karena pakai base path '/komunitas-prestasi-ipb62/'
-    var l = window.location;
-    l.replace(
-      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-      l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-      l.hash
-    );
+    // Simpan path asli yang user tuju, biar nanti di-restore oleh main.jsx
+    sessionStorage.redirect = location.pathname + location.search + location.hash;
   </script>
+  <meta http-equiv="refresh" content="0;URL='/komunitas-prestasi-ipb62/'">
 </head>
 <body></body>
 </html>
